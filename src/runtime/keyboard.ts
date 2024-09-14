@@ -1,4 +1,4 @@
-import { defineNuxtPlugin } from '#app'
+import { defineNuxtPlugin, type Plugin } from '#app'
 
 type KeyHandler = (event: KeyboardEvent) => void
 
@@ -64,24 +64,29 @@ const up = (key: string, handler: KeyHandler) => {
   handlers.up[key].push(handler)
 }
 
-const keyboard = {
-  init,
-  stop,
-  down,
-  up,
+interface Keyboard {
+  init: () => void
+  stop: () => void
+  down: (key: string, handler: KeyHandler) => void
+  up: (key: string, handler: KeyHandler) => void
 }
 
-export default defineNuxtPlugin((nuxtApp) => {
+const keyboard: Plugin<{ keyboard: Keyboard }> = defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:mounted', () => {
-    keyboard.stop()
-    keyboard.init()
-
-    window.addEventListener('beforeunload', keyboard.stop)
+    stop()
+    init()
   })
 
   return {
     provide: {
-      keyboard,
+      keyboard: {
+        init,
+        stop,
+        down,
+        up,
+      },
     },
   }
 })
+
+export default keyboard
