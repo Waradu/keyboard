@@ -3,6 +3,7 @@
   "version": "1.0.2",
   "description": "Keyboard manager",
   "repository": "waradu/keyboard",
+  "homepage": "https://waradu.dev",
   "license": "MIT",
   "type": "module",
   "exports": {
