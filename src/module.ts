@@ -4,6 +4,9 @@ export default defineNuxtModule({
   meta: {
     name: 'wrdu-keyboard',
     configKey: 'wrduKeyboard',
+    compatibility: {
+      nuxt: '>=3.10.0',
+    },
   },
   defaults: {},
   setup(_options, _nuxt) {
