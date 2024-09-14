@@ -9,8 +9,10 @@ export default defineNuxtModule({
     },
   },
   defaults: {},
-  setup(_options, _nuxt) {
+  setup(_options, nuxt) {
     const resolver = createResolver(import.meta.url)
+
+    nuxt.options.build.transpile.push(resolver.resolve('./runtime'))
 
     const composables = resolver.resolve('./runtime/composables')
     addImports([
@@ -20,6 +22,8 @@ export default defineNuxtModule({
       },
     ])
 
-    addPlugin(resolver.resolve('./runtime/keyboard'))
+    nuxt.hook('modules:done', () => {
+      addPlugin(resolver.resolve('./runtime/keyboard'))
+    })
   },
 })
