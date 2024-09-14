@@ -64,7 +64,7 @@ const up = (key: string, handler: KeyHandler) => {
   handlers.up[key].push(handler)
 }
 
-interface Keyboard {
+export interface Keyboard {
   init: () => void
   stop: () => void
   down: (key: string, handler: KeyHandler) => void
