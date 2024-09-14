@@ -2,7 +2,7 @@
   "name": "wrdu-keyboard",
   "version": "1.0.2",
   "description": "Keyboard manager",
-  "repository": "waradu/wrdu-keyboard",
+  "repository": "waradu/keyboard",
   "license": "MIT",
   "type": "module",
   "exports": {
