@@ -6,6 +6,7 @@ type Handler = (event: KeyboardEvent) => void
 type KeyHandler = {
   prevent: boolean
   handler: Handler
+  once: boolean
 }
 
 interface Handlers {
@@ -17,7 +18,7 @@ interface Handlers {
   }
 }
 
-const getKeyString = (keys: Key[]) => keys.sort().join('+')
+const getKeyString = (keys: Key[]) => keys[0] == Key.All ? keys.sort().join('+') : 'All'
 
 const handlers: Handlers = {
   down: {},
@@ -33,20 +34,14 @@ const onKeydown = (event: KeyboardEvent) => {
   const keyString = getKeyString(pressedArray)
 
   if (handlers.down[keyString]) {
-    handlers.down[keyString].forEach((handler) => {
-      if (handler.prevent) {
+    handlers.down[keyString].forEach((eventHandler) => {
+      if (eventHandler.prevent) {
         event.preventDefault()
       }
-      handler.handler(event)
-    })
-  }
-
-  if (handlers.down[Key.All]) {
-    handlers.down[Key.All].forEach((handler) => {
-      if (handler.prevent) {
-        event.preventDefault()
+      eventHandler.handler(event)
+      if (eventHandler.once) {
+        handlers.down[keyString] = handlers.down[keyString].filter(h => h !== eventHandler)
       }
-      handler.handler(event)
     })
   }
 }
@@ -58,11 +53,15 @@ const onKeyup = (event: KeyboardEvent) => {
   const keyString = getKeyString(releasedArray)
 
   if (handlers.up[keyString]) {
-    handlers.up[keyString].forEach(handler => handler.handler(event))
-  }
-
-  if (handlers.up[Key.All]) {
-    handlers.up[Key.All].forEach(handler => handler.handler(event))
+    handlers.up[keyString].forEach((eventHandler) => {
+      if (eventHandler.prevent) {
+        event.preventDefault()
+      }
+      eventHandler.handler(event)
+      if (eventHandler.once) {
+        handlers.up[keyString] = handlers.up[keyString].filter(h => h !== eventHandler)
+      }
+    })
   }
 }
 
@@ -77,34 +76,67 @@ const stop = () => {
   window.removeEventListener('keyup', onKeyup)
 }
 
-const down = (keys: Key[], handler: Handler, prevent: boolean) => {
+type Config = {
+  once?: boolean
+  prevent?: boolean
+}
+
+const down = (keys: Key[], handler: Handler, config: Config = {}) => {
+  if (keys.includes(Key.All)) {
+    keys = [Key.All]
+  }
+
+  if (keys.length === 0) {
+    throw new Error('At least one key must be provided')
+  }
+
   const key = getKeyString(keys)
   if (!handlers.down[key]) {
     handlers.down[key] = []
   }
-  handlers.down[key].push({ handler, prevent })
+
+  const { once = false, prevent = false } = config
+
+  handlers.down[key].push({ handler, prevent, once })
 }
 
-const up = (keys: Key[], handler: Handler, prevent: boolean) => {
+const up = (keys: Key[], handler: Handler, config: Config = {}) => {
+  if (keys.includes(Key.All)) {
+    keys = [Key.All]
+  }
+
+  if (keys.length === 0) {
+    throw new Error('At least one key must be provided')
+  }
+
   const key = getKeyString(keys)
   if (!handlers.up[key]) {
     handlers.up[key] = []
   }
-  handlers.up[key].push({ handler, prevent })
+
+  const { once = false, prevent = false } = config
+
+  handlers.up[key].push({ handler, prevent, once })
 }
+
+type PublicConfig = Omit<Config, 'prevent'>
+
+type New = (keys: Key[], handler: Handler, config?: PublicConfig) => void
 
 export interface Keyboard {
   init: () => void
   stop: () => void
-  down: (keys: Key[], handler: Handler) => void
-  up: (keys: Key[], handler: Handler) => void
+  down: New
+  up: New
   prevent: {
-    down: (keys: Key[], handler: Handler) => void
-    up: (keys: Key[], handler: Handler) => void
+    down: New
+    up: New
   }
 }
 
-const keyboard: Plugin<{ keyboard: Keyboard }> = defineNuxtPlugin((nuxtApp) => {
+type KeyboardPlugin = Plugin<{ keyboard: Keyboard }>
+
+const keyboard: KeyboardPlugin = defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:mounted', () => {
     init()
   })
@@ -114,11 +146,11 @@ const keyboard: Plugin<{ keyboard: Keyboard }> = defineNuxtPlugin((nuxtApp) => {
       keyboard: {
         init,
         stop,
-        down: (keys: Key[], handler: Handler) => down(keys, handler, false),
-        up: (keys: Key[], handler: Handler) => up(keys, handler, false),
+        down: (keys: Key[], handler: Handler, config: PublicConfig = {}) => down(keys, handler, config),
+        up: (keys: Key[], handler: Handler, config: PublicConfig = {}) => up(keys, handler, config),
         prevent: {
-          down: (keys: Key[], handler: Handler) => down(keys, handler, true),
-          up: (keys: Key[], handler: Handler) => up(keys, handler, true),
+          down: (keys: Key[], handler: Handler, config: PublicConfig = {}) => down(keys, handler, { ...config, prevent: true }),
+          up: (keys: Key[], handler: Handler, config: PublicConfig = {}) => up(keys, handler, { ...config, prevent: true }),
         },
       },
     },
