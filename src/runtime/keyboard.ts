@@ -1,81 +1,95 @@
-import { defineNuxtPlugin, type Plugin } from '#app'
+import { Key } from "../types/keys";
+import { defineNuxtPlugin, type Plugin } from "#app";
 
-type KeyHandler = (event: KeyboardEvent) => void
+type KeyHandler = (event: KeyboardEvent) => void;
 
 interface Handlers {
   down: {
-    [key: string]: KeyHandler[]
-  }
+    [key: string]: KeyHandler[];
+  };
   up: {
-    [key: string]: KeyHandler[]
-  }
+    [key: string]: KeyHandler[];
+  };
 }
+
+const getKeyString = (keys: Key[]) => keys.sort().join("+");
 
 const handlers: Handlers = {
   down: {},
   up: {},
-}
+};
+
+const pressedKeys = new Set<Key>();
 
 const onKeydown = (event: KeyboardEvent) => {
-  const keyHandlers = handlers.down[event.key]
-  if (keyHandlers) {
-    keyHandlers.forEach(handler => handler(event))
+  pressedKeys.add(event.code as Key);
+
+  const pressedArray = Array.from(pressedKeys) as Key[];
+  const keyString = getKeyString(pressedArray);
+
+  if (handlers.down[keyString]) {
+    handlers.down[keyString].forEach((handler) => handler(event));
   }
 
-  const allKeyHandlers = handlers.down['all']
-  if (allKeyHandlers) {
-    allKeyHandlers.forEach(handler => handler(event))
+  // Handle global handlers (if any)
+  if (handlers.down[Key.All]) {
+    handlers.down[Key.All].forEach((handler) => handler(event));
   }
-}
+};
 
 const onKeyup = (event: KeyboardEvent) => {
-  const keyHandlers = handlers.up[event.key]
-  if (keyHandlers) {
-    keyHandlers.forEach(handler => handler(event))
+  pressedKeys.delete(event.code as Key);
+
+  const releasedArray = Array.from(pressedKeys) as Key[];
+  const keyString = getKeyString(releasedArray);
+
+  if (handlers.up[keyString]) {
+    handlers.up[keyString].forEach((handler) => handler(event));
   }
 
-  const allKeyHandlers = handlers.up['all']
-  if (allKeyHandlers) {
-    allKeyHandlers.forEach(handler => handler(event))
+  // Handle global handlers (if any)
+  if (handlers.up[Key.All]) {
+    handlers.up[Key.All].forEach((handler) => handler(event));
   }
-}
+};
 
 const init = () => {
-  window.addEventListener('keydown', onKeydown)
-  window.addEventListener('keyup', onKeyup)
-}
+  window.addEventListener("keydown", onKeydown);
+  window.addEventListener("keyup", onKeyup);
+};
 
 const stop = () => {
-  window.removeEventListener('keydown', onKeydown)
-  window.removeEventListener('keyup', onKeyup)
-}
+  window.removeEventListener("keydown", onKeydown);
+  window.removeEventListener("keyup", onKeyup);
+};
 
-const down = (key: string, handler: KeyHandler) => {
+const down = (keys: Key[], handler: KeyHandler) => {
+  const key = getKeyString(keys);
   if (!handlers.down[key]) {
-    handlers.down[key] = []
+    handlers.down[key] = [];
   }
-  handlers.down[key].push(handler)
-}
+  handlers.down[key].push(handler);
+};
 
-const up = (key: string, handler: KeyHandler) => {
+const up = (keys: Key[], handler: KeyHandler) => {
+  const key = getKeyString(keys);
   if (!handlers.up[key]) {
-    handlers.up[key] = []
+    handlers.up[key] = [];
   }
-  handlers.up[key].push(handler)
-}
+  handlers.up[key].push(handler);
+};
 
 export interface Keyboard {
-  init: () => void
-  stop: () => void
-  down: (key: string, handler: KeyHandler) => void
-  up: (key: string, handler: KeyHandler) => void
+  init: () => void;
+  stop: () => void;
+  down: (keys: Key[], handler: KeyHandler) => void;
+  up: (keys: Key[], handler: KeyHandler) => void;
 }
 
 const keyboard: Plugin<{ keyboard: Keyboard }> = defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.hook('app:mounted', () => {
-    stop()
-    init()
-  })
+  nuxtApp.hook("app:mounted", () => {
+    init();
+  });
 
   return {
     provide: {
@@ -86,7 +100,7 @@ const keyboard: Plugin<{ keyboard: Keyboard }> = defineNuxtPlugin((nuxtApp) => {
         up,
       },
     },
-  }
-})
+  };
+});
 
-export default keyboard
+export default keyboard;
