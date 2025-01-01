@@ -27,6 +27,8 @@ That's it! You can now use Keyboard in your Nuxt app ✨
 Setup script:
 
 ```js
+import { Key } from "wrdu-keyboard/key";
+
 const keyboard = useKeyboard()
 
 // Register a keydown handler for Shift + A
@@ -43,6 +45,16 @@ keyboard.up([Key.LeftControl, Key.LeftAlt, Key.K], (event) => {
 keyboard.down([Key.All], (event) => {
   console.log('Any key pressed')
 })
+
+// Register a keyup handler that calls preventDefault automatic
+keyboard.prevent.up([Key.LeftShift, Key.A], (event) => {
+  console.log('Shift + A prevented')
+})
+
+// Register a keyup handler that only gets called once
+keyboard.down([Key.LeftShift, Key.A], (event) => {
+  console.log('Shift + A prevented')
+}, { once: true })
 ```
 
 The `down` and `up` methods allow you to register handlers for specific key combinations. You can pass an array of `Key` enum values to specify the desired combination.
