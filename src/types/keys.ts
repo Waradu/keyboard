@@ -108,5 +108,5 @@ export enum Key {
   Backslash = 'Backslash',
   RightBracket = 'BracketRight',
   Quote = 'Quote',
-  All = "All",
+  All = 'All',
 }

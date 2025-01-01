@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { Key } from '../src/types/keys';
+import { Key } from '../src/types/keys'
 
 const keyboard = useKeyboard()
 
