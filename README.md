@@ -7,8 +7,7 @@
 
 ## Features
 
-<!-- Highlight some of the features your module provide here -->
-Manage keybinds for your nuxt app
+Manage keybinds for your Nuxt app
 
 - keyboard.up
 - keyboard.down
@@ -30,12 +29,27 @@ Setup script:
 ```js
 const keyboard = useKeyboard()
 
-keyboard.down('a', (event) => {
-  // do something
+// Register a keydown handler for Shift + A
+keyboard.down([Key.LeftShift, Key.A], (event) => {
+  console.log('Shift + A pressed')
+})
+
+// Register a keyup handler for Ctrl + Alt + K
+keyboard.up([Key.LeftControl, Key.LeftAlt, Key.K], (event) => {
+  console.log('Ctrl + Alt + K released')
+})
+
+// Register a global keydown handler for all keys
+keyboard.down([Key.All], (event) => {
+  console.log('Any key pressed')
 })
 ```
 
-if you want to check for all keys use "all"
+The `down` and `up` methods allow you to register handlers for specific key combinations. You can pass an array of `Key` enum values to specify the desired combination.
+
+The `Key` enum provides constants for commonly used keys, such as `Key.LeftShift`, `Key.A`, `Key.LeftControl`, etc. You can find the complete list of available keys in the `src/types/keys.ts` file.
+
+To register a global handler that triggers for any key press or release, you can use `Key.All` as the only element in the array.
 
 ## Contribution
 

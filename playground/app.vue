@@ -5,9 +5,11 @@
 </template>
 
 <script setup lang="ts">
+import { Key } from '../src/types/keys';
+
 const keyboard = useKeyboard()
 
-keyboard.down('all', (e) => {
-  console.log(e)
+keyboard.down([Key.LeftShift, Key.A], (event) => {
+  console.log(event)
 })
 </script>
