@@ -1,161 +1,161 @@
-import { Key } from "./types/keys";
-import { defineNuxtPlugin, type Plugin } from "#app";
+import { Key } from './types/keys'
+import { defineNuxtPlugin, type Plugin } from '#app'
 
-type Handler = (event: KeyboardEvent) => void;
+type Handler = (event: KeyboardEvent) => void
 
 type KeyHandler = {
-  prevent: boolean;
-  handler: Handler;
-  once: boolean;
-};
+  prevent: boolean
+  handler: Handler
+  once: boolean
+}
 
 interface Handlers {
   down: {
-    [key: string]: KeyHandler[];
-  };
+    [key: string]: KeyHandler[]
+  }
   up: {
-    [key: string]: KeyHandler[];
-  };
+    [key: string]: KeyHandler[]
+  }
 }
 
 const getKeyString = (keys: Key[]) =>
-  keys.includes(Key.All) ? "All" : keys.sort().join("+");
+  keys.includes(Key.All) ? 'All' : keys.sort().join('+')
 
 const handlers: Handlers = {
   down: {},
   up: {},
-};
+}
 
-const pressedKeys = new Set<Key>();
+const pressedKeys = new Set<Key>()
 
 const onKeydown = (event: KeyboardEvent) => {
-  const key = event.code as Key;
-  pressedKeys.add(key);
+  const key = event.code as Key
+  pressedKeys.add(key)
 
-  const pressedArray = Array.from(pressedKeys) as Key[];
+  const pressedArray = Array.from(pressedKeys) as Key[]
 
   for (const keyString of [getKeyString(pressedArray), 'All']) {
     if (handlers.down[keyString]) {
       handlers.down[keyString].forEach((eventHandler) => {
         if (eventHandler.prevent) {
-          event.preventDefault();
+          event.preventDefault()
         }
-        eventHandler.handler(event);
+        eventHandler.handler(event)
         if (eventHandler.once) {
           handlers.down[keyString] = handlers.down[keyString].filter(
-            (h) => h !== eventHandler
-          );
+            h => h !== eventHandler,
+          )
         }
-      });
+      })
     }
   }
-};
+}
 
 const onKeyup = (event: KeyboardEvent) => {
-  const key = event.code as Key;
-  pressedKeys.delete(key);
+  const key = event.code as Key
+  pressedKeys.delete(key)
 
-  const releasedArray = Array.from(pressedKeys) as Key[];
+  const releasedArray = Array.from(pressedKeys) as Key[]
 
   for (const keyString of [getKeyString(releasedArray), 'All']) {
     if (handlers.up[keyString]) {
       handlers.up[keyString].forEach((eventHandler) => {
         if (eventHandler.prevent) {
-          event.preventDefault();
+          event.preventDefault()
         }
-        eventHandler.handler(event);
+        eventHandler.handler(event)
         if (eventHandler.once) {
           handlers.up[keyString] = handlers.up[keyString].filter(
-            (h) => h !== eventHandler
-          );
+            h => h !== eventHandler,
+          )
         }
-      });
+      })
     }
   }
-};
+}
 
 const init = () => {
-  stop();
-  pressedKeys.clear();
-  window.addEventListener("keydown", onKeydown);
-  window.addEventListener("keyup", onKeyup);
-};
+  stop()
+  pressedKeys.clear()
+  window.addEventListener('keydown', onKeydown)
+  window.addEventListener('keyup', onKeyup)
+}
 
 const stop = () => {
-  window.removeEventListener("keydown", onKeydown);
-  window.removeEventListener("keyup", onKeyup);
-};
+  window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('keyup', onKeyup)
+}
 
 const unregisterAll = () => {
-  handlers.down = {};
-  handlers.up = {};
-};
+  handlers.down = {}
+  handlers.up = {}
+}
 
 type Config = {
-  once?: boolean;
-  prevent?: boolean;
-};
+  once?: boolean
+  prevent?: boolean
+}
 
 const down = (keys: Key[], handler: Handler, config: Config = {}) => {
   if (keys.includes(Key.All)) {
-    keys = [Key.All];
+    keys = [Key.All]
   }
 
   if (keys.length === 0) {
-    throw new Error("At least one key must be provided");
+    throw new Error('At least one key must be provided')
   }
 
-  const key = getKeyString(keys);
+  const key = getKeyString(keys)
   if (!handlers.down[key]) {
-    handlers.down[key] = [];
+    handlers.down[key] = []
   }
 
-  const { once = false, prevent = false } = config;
+  const { once = false, prevent = false } = config
 
-  handlers.down[key].push({ handler, prevent, once });
-};
+  handlers.down[key].push({ handler, prevent, once })
+}
 
 const up = (keys: Key[], handler: Handler, config: Config = {}) => {
   if (keys.includes(Key.All)) {
-    keys = [Key.All];
+    keys = [Key.All]
   }
 
   if (keys.length === 0) {
-    throw new Error("At least one key must be provided");
+    throw new Error('At least one key must be provided')
   }
 
-  const key = getKeyString(keys);
+  const key = getKeyString(keys)
   if (!handlers.up[key]) {
-    handlers.up[key] = [];
+    handlers.up[key] = []
   }
 
-  const { once = false, prevent = false } = config;
+  const { once = false, prevent = false } = config
 
-  handlers.up[key].push({ handler, prevent, once });
-};
-
-type PublicConfig = Omit<Config, "prevent">;
-
-type New = (keys: Key[], handler: Handler, config?: PublicConfig) => void;
-
-export interface Keyboard {
-  init: () => void;
-  stop: () => void;
-  unregisterAll: () => void;
-  down: New;
-  up: New;
-  prevent: {
-    down: New;
-    up: New;
-  };
+  handlers.up[key].push({ handler, prevent, once })
 }
 
-type KeyboardPlugin = Plugin<{ keyboard: Keyboard }>;
+type PublicConfig = Omit<Config, 'prevent'>
 
-const keyboard: KeyboardPlugin = defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.hook("app:mounted", () => {
-    init();
-  });
+type New = (keys: Key[], handler: Handler, config?: PublicConfig) => void
+
+export interface Keyboard {
+  init: () => void
+  stop: () => void
+  unregisterAll: () => void
+  down: New
+  up: New
+  prevent: {
+    down: New
+    up: New
+  }
+}
+
+type KeyboardPlugin = Plugin<{ keyboard: Keyboard }>
+
+const keyboard: KeyboardPlugin = defineNuxtPlugin((nuxtApp: { hook: (name: string, cb: () => void) => void }) => {
+  nuxtApp.hook('app:mounted', () => {
+    init()
+  })
 
   return {
     provide: {
@@ -175,7 +175,7 @@ const keyboard: KeyboardPlugin = defineNuxtPlugin((nuxtApp) => {
         },
       },
     },
-  };
-});
+  }
+})
 
-export default keyboard;
+export default keyboard
