@@ -5,6 +5,8 @@
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
+KNOWN ISSUE: keyboard.up does not work correctly and devmode has some bugs.
+
 ## Features
 
 Manage keybinds for your Nuxt app

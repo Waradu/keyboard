@@ -47,8 +47,6 @@ const onKeydown = (event: KeyboardEvent) => {
 }
 
 const onKeyup = (event: KeyboardEvent) => {
-  pressedKeys.delete(event.code as Key)
-
   const releasedArray = Array.from(pressedKeys) as Key[]
   const keyString = getKeyString(releasedArray)
 
@@ -63,6 +61,14 @@ const onKeyup = (event: KeyboardEvent) => {
       }
     })
   }
+
+  pressedKeys.delete(event.code as Key)
+}
+
+const clear = () => {
+  handlers.down = {}
+  handlers.up = {}
+  pressedKeys.clear()
 }
 
 const init = () => {
@@ -126,6 +132,7 @@ type New = (keys: Key[], handler: Handler, config?: PublicConfig) => void
 export interface Keyboard {
   init: () => void
   stop: () => void
+  clear: () => void
   down: New
   up: New
   prevent: {
@@ -146,6 +153,7 @@ const keyboard: KeyboardPlugin = defineNuxtPlugin((nuxtApp) => {
       keyboard: {
         init,
         stop,
+        clear,
         down: (keys: Key[], handler: Handler, config: PublicConfig = {}) => down(keys, handler, config),
         up: (keys: Key[], handler: Handler, config: PublicConfig = {}) => up(keys, handler, config),
         prevent: {
