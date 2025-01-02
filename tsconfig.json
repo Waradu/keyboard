@@ -1,8 +1,17 @@
 {
-  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["esnext", "dom"],
+    "esModuleInterop": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true
+  },
   "exclude": [
     "dist",
     "node_modules",
-    "playground",
+    "playground"
   ]
 }
