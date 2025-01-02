@@ -18,7 +18,7 @@ interface Handlers {
   }
 }
 
-const getKeyString = (keys: Key[]) => keys[0] == Key.All ? keys.sort().join('+') : 'All'
+const getKeyString = (keys: Key[]) => keys[0] == Key.All ? 'All' : keys.sort().join('+')
 
 const handlers: Handlers = {
   down: {},
