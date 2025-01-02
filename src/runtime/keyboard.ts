@@ -33,20 +33,21 @@ const onKeydown = (event: KeyboardEvent) => {
   pressedKeys.add(key);
 
   const pressedArray = Array.from(pressedKeys) as Key[];
-  const keyString = getKeyString(pressedArray);
 
-  if (handlers.down[keyString]) {
-    handlers.down[keyString].forEach((eventHandler) => {
-      if (eventHandler.prevent) {
-        event.preventDefault();
-      }
-      eventHandler.handler(event);
-      if (eventHandler.once) {
-        handlers.down[keyString] = handlers.down[keyString].filter(
-          (h) => h !== eventHandler
-        );
-      }
-    });
+  for (const keyString of [getKeyString(pressedArray), 'All']) {
+    if (handlers.down[keyString]) {
+      handlers.down[keyString].forEach((eventHandler) => {
+        if (eventHandler.prevent) {
+          event.preventDefault();
+        }
+        eventHandler.handler(event);
+        if (eventHandler.once) {
+          handlers.down[keyString] = handlers.down[keyString].filter(
+            (h) => h !== eventHandler
+          );
+        }
+      });
+    }
   }
 };
 
@@ -55,20 +56,21 @@ const onKeyup = (event: KeyboardEvent) => {
   pressedKeys.delete(key);
 
   const releasedArray = Array.from(pressedKeys) as Key[];
-  const keyString = getKeyString(releasedArray);
 
-  if (handlers.up[keyString]) {
-    handlers.up[keyString].forEach((eventHandler) => {
-      if (eventHandler.prevent) {
-        event.preventDefault();
-      }
-      eventHandler.handler(event);
-      if (eventHandler.once) {
-        handlers.up[keyString] = handlers.up[keyString].filter(
-          (h) => h !== eventHandler
-        );
-      }
-    });
+  for (const keyString of [getKeyString(releasedArray), 'All']) {
+    if (handlers.up[keyString]) {
+      handlers.up[keyString].forEach((eventHandler) => {
+        if (eventHandler.prevent) {
+          event.preventDefault();
+        }
+        eventHandler.handler(event);
+        if (eventHandler.once) {
+          handlers.up[keyString] = handlers.up[keyString].filter(
+            (h) => h !== eventHandler
+          );
+        }
+      });
+    }
   }
 };
 
