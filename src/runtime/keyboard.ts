@@ -27,12 +27,23 @@ const handlers: Handlers = {
 
 const pressedKeys = new Set<Key>()
 
+const handleAll = (event: KeyboardEvent, type: 'up' | 'down') => {
+  if (handlers[type]['All']) {
+    handlers[type]['All'].forEach((eventHandler) => {
+      if (eventHandler.prevent) event.preventDefault()
+      eventHandler.handler(event)
+      if (eventHandler.once) {
+        handlers[type]['All'] = handlers[type]['All'].filter(h => h !== eventHandler)
+      }
+    })
+  }
+}
+
 const onKeydown = (event: KeyboardEvent) => {
   pressedKeys.add(event.code as Key)
 
   const pressedArray = Array.from(pressedKeys) as Key[]
   const keyString = getKeyString(pressedArray)
-
   if (handlers.down[keyString]) {
     handlers.down[keyString].forEach((eventHandler) => {
       if (eventHandler.prevent) event.preventDefault()
@@ -43,15 +54,7 @@ const onKeydown = (event: KeyboardEvent) => {
     })
   }
 
-  if (handlers.down['All']) {
-    handlers.down['All'].forEach((eventHandler) => {
-      if (eventHandler.prevent) event.preventDefault()
-      eventHandler.handler(event)
-      if (eventHandler.once) {
-        handlers.down['All'] = handlers.down['All'].filter(h => h !== eventHandler)
-      }
-    })
-  }
+  handleAll(event, 'down')
 }
 
 const onKeyup = (event: KeyboardEvent) => {
@@ -70,6 +73,7 @@ const onKeyup = (event: KeyboardEvent) => {
     })
   }
 
+  handleAll(event, 'up')
   pressedKeys.delete(event.code as Key)
 }
 
