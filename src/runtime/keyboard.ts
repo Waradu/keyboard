@@ -35,12 +35,20 @@ const onKeydown = (event: KeyboardEvent) => {
 
   if (handlers.down[keyString]) {
     handlers.down[keyString].forEach((eventHandler) => {
-      if (eventHandler.prevent) {
-        event.preventDefault()
-      }
+      if (eventHandler.prevent) event.preventDefault()
       eventHandler.handler(event)
       if (eventHandler.once) {
         handlers.down[keyString] = handlers.down[keyString].filter(h => h !== eventHandler)
+      }
+    })
+  }
+
+  if (handlers.down['All']) {
+    handlers.down['All'].forEach((eventHandler) => {
+      if (eventHandler.prevent) event.preventDefault()
+      eventHandler.handler(event)
+      if (eventHandler.once) {
+        handlers.down['All'] = handlers.down['All'].filter(h => h !== eventHandler)
       }
     })
   }
