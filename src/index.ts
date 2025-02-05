@@ -43,7 +43,6 @@ const handleAll = (event: KeyboardEvent, type: "up" | "down") => {
 
 const onKeydown = (event: KeyboardEvent) => {
   pressedKeys.add(event.code as Key);
-
   const pressedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(pressedArray);
   if (handlers.down[keyString]) {
@@ -57,14 +56,12 @@ const onKeydown = (event: KeyboardEvent) => {
       }
     });
   }
-
   handleAll(event, "down");
 };
 
 const onKeyup = (event: KeyboardEvent) => {
   const releasedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(releasedArray);
-
   if (handlers.up[keyString]) {
     handlers.up[keyString].forEach((eventHandler) => {
       if (eventHandler.prevent) event.preventDefault();
@@ -76,7 +73,6 @@ const onKeyup = (event: KeyboardEvent) => {
       }
     });
   }
-
   handleAll(event, "up");
   pressedKeys.delete(event.code as Key);
 };
@@ -87,15 +83,19 @@ const clear = () => {
   pressedKeys.clear();
 };
 
-const init = () => {
-  stop();
-  window.addEventListener("keydown", onKeydown);
-  window.addEventListener("keyup", onKeyup);
+const stop = () => {
+  if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+    window.removeEventListener("keydown", onKeydown);
+    window.removeEventListener("keyup", onKeyup);
+  }
 };
 
-const stop = () => {
-  window.removeEventListener("keydown", onKeydown);
-  window.removeEventListener("keyup", onKeyup);
+const init = () => {
+  stop();
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("keydown", onKeydown);
+    window.addEventListener("keyup", onKeyup);
+  }
 };
 
 type Config = {
@@ -107,18 +107,14 @@ const down = (keys: Key[], handler: Handler, config: Config = {}) => {
   if (keys.includes(Key.All)) {
     keys = [Key.All];
   }
-
   if (keys.length === 0) {
     throw new Error("At least one key must be provided");
   }
-
   const key = getKeyString(keys);
   if (!handlers.down[key]) {
     handlers.down[key] = [];
   }
-
   const { once = false, prevent = false } = config;
-
   handlers.down[key].push({ handler, prevent, once });
 };
 
@@ -126,18 +122,14 @@ const up = (keys: Key[], handler: Handler, config: Config = {}) => {
   if (keys.includes(Key.All)) {
     keys = [Key.All];
   }
-
   if (keys.length === 0) {
     throw new Error("At least one key must be provided");
   }
-
   const key = getKeyString(keys);
   if (!handlers.up[key]) {
     handlers.up[key] = [];
   }
-
   const { once = false, prevent = false } = config;
-
   handlers.up[key].push({ handler, prevent, once });
 };
 
