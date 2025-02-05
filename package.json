@@ -6,15 +6,23 @@
   "homepage": "https://waradu.dev",
   "license": "MIT",
   "type": "module",
-  "main": "./dist/keyboard.js",
-  "types": "./dist/keyboard.d.ts",
+  "main": "./dist/index.ts",
+  "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "prepare": "npm run build"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.ts"
+    }
   },
   "keywords": [
     "keyboard",
