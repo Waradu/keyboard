@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { keyboard, Key } from '../src'
+import { keyboard, Key } from 'wrdu-keyboard'
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const logs = ref<string[]>([])
