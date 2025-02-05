@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "nuxt": "^3.13.1",
-    "wrdu-keyboard": "github:0PandaDEV/keyboard#main"
+    "wrdu-keyboard": "https://github.com/0PandaDEV/keyboard#1525be1"
   }
 }
