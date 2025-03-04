@@ -99,6 +99,10 @@ const init = (): void => {
     window.addEventListener("keydown", onKeydown);
     window.addEventListener("keyup", onKeyup);
   }
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("keydown", onKeydown);
+    window.addEventListener("keyup", onKeyup);
+  }
 };
 
 type Config = {
