@@ -17,7 +17,7 @@ interface Handlers {
   };
 }
 
-const getKeyString = (keys: Key[]) =>
+const getKeyString = (keys: Key[]): string =>
   keys[0] == Key.All ? "All" : keys.sort().join("+");
 
 const handlers: Handlers = {
@@ -27,13 +27,14 @@ const handlers: Handlers = {
 
 const pressedKeys = new Set<Key>();
 
-const handleAll = (event: KeyboardEvent, type: "up" | "down") => {
-  if (handlers[type]["All"]) {
-    handlers[type]["All"].forEach((eventHandler) => {
+const handleAll = (event: KeyboardEvent, type: "up" | "down"): void => {
+  const allHandlers = handlers[type]["All"];
+  if (allHandlers?.length) {
+    allHandlers.forEach((eventHandler) => {
       if (eventHandler.prevent) event.preventDefault();
       eventHandler.handler(event);
       if (eventHandler.once) {
-        handlers[type]["All"] = handlers[type]["All"].filter(
+        handlers[type]["All"] = (handlers[type]["All"] || []).filter(
           (h) => h !== eventHandler
         );
       }
@@ -41,16 +42,17 @@ const handleAll = (event: KeyboardEvent, type: "up" | "down") => {
   }
 };
 
-const onKeydown = (event: KeyboardEvent) => {
+const onKeydown = (event: KeyboardEvent): void => {
   pressedKeys.add(event.code as Key);
   const pressedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(pressedArray);
-  if (handlers.down[keyString]) {
-    handlers.down[keyString].forEach((eventHandler) => {
+  const keyHandlers = handlers.down[keyString];
+  if (keyHandlers?.length) {
+    keyHandlers.forEach((eventHandler) => {
       if (eventHandler.prevent) event.preventDefault();
       eventHandler.handler(event);
       if (eventHandler.once) {
-        handlers.down[keyString] = handlers.down[keyString].filter(
+        handlers.down[keyString] = (handlers.down[keyString] || []).filter(
           (h) => h !== eventHandler
         );
       }
@@ -59,15 +61,16 @@ const onKeydown = (event: KeyboardEvent) => {
   handleAll(event, "down");
 };
 
-const onKeyup = (event: KeyboardEvent) => {
+const onKeyup = (event: KeyboardEvent): void => {
   const releasedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(releasedArray);
-  if (handlers.up[keyString]) {
-    handlers.up[keyString].forEach((eventHandler) => {
+  const keyHandlers = handlers.up[keyString];
+  if (keyHandlers?.length) {
+    keyHandlers.forEach((eventHandler) => {
       if (eventHandler.prevent) event.preventDefault();
       eventHandler.handler(event);
       if (eventHandler.once) {
-        handlers.up[keyString] = handlers.up[keyString].filter(
+        handlers.up[keyString] = (handlers.up[keyString] || []).filter(
           (h) => h !== eventHandler
         );
       }
@@ -77,20 +80,20 @@ const onKeyup = (event: KeyboardEvent) => {
   pressedKeys.delete(event.code as Key);
 };
 
-const clear = () => {
+const clear = (): void => {
   handlers.down = {};
   handlers.up = {};
   pressedKeys.clear();
 };
 
-const stop = () => {
+const stop = (): void => {
   if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
     window.removeEventListener("keydown", onKeydown);
     window.removeEventListener("keyup", onKeyup);
   }
 };
 
-const init = () => {
+const init = (): void => {
   stop();
   if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
     window.addEventListener("keydown", onKeydown);
@@ -103,7 +106,7 @@ type Config = {
   prevent?: boolean;
 };
 
-const down = (keys: Key[], handler: Handler, config: Config = {}) => {
+const down = (keys: Key[], handler: Handler, config: Config = {}): void => {
   if (keys.includes(Key.All)) {
     keys = [Key.All];
   }
@@ -118,7 +121,7 @@ const down = (keys: Key[], handler: Handler, config: Config = {}) => {
   handlers.down[key].push({ handler, prevent, once });
 };
 
-const up = (keys: Key[], handler: Handler, config: Config = {}) => {
+const up = (keys: Key[], handler: Handler, config: Config = {}): void => {
   if (keys.includes(Key.All)) {
     keys = [Key.All];
   }
@@ -140,16 +143,8 @@ export interface Keyboard {
   down: (keys: Key[], handler: Handler, config?: Config) => void;
   up: (keys: Key[], handler: Handler, config?: Config) => void;
   prevent: {
-    down: (
-      keys: Key[],
-      handler: Handler,
-      config?: Omit<Config, "prevent">
-    ) => void;
-    up: (
-      keys: Key[],
-      handler: Handler,
-      config?: Omit<Config, "prevent">
-    ) => void;
+    down: (keys: Key[], handler: Handler, config?: Omit<Config, "prevent">) => void;
+    up: (keys: Key[], handler: Handler, config?: Omit<Config, "prevent">) => void;
   };
 }
 
@@ -160,10 +155,8 @@ export const keyboard: Keyboard = {
   down,
   up,
   prevent: {
-    down: (keys, handler, config = {}) =>
-      down(keys, handler, { ...config, prevent: true }),
-    up: (keys, handler, config = {}) =>
-      up(keys, handler, { ...config, prevent: true }),
+    down: (keys, handler, config = {}) => down(keys, handler, { ...config, prevent: true }),
+    up: (keys, handler, config = {}) => up(keys, handler, { ...config, prevent: true }),
   },
 };
 
