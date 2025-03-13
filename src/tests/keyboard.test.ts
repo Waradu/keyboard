@@ -12,7 +12,7 @@ describe('Keyboard', () => {
   test('should handle key events', () => {
     keyboard.init();
     let pressed = false;
-    keyboard.down([Key.A], () => {
+    keyboard.down([Key.All], () => {
       pressed = true;
     });
     expect(pressed).toBe(false);
