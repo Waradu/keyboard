@@ -14,8 +14,12 @@ keyboard.down([Key.A], () => {
   message.value = 'A key pressed';
 });
 
-keyboard.down([Key.LeftShift, Key.B], () => {
-  message.value = 'Shift + B pressed';
+keyboard.down([Key.AltLeft, Key.L], () => {
+  message.value = 'Alt + L pressed';
+});
+
+keyboard.down([Key.AltRight, Key.L], () => {
+  message.value = 'AltRight + L pressed';
 });
 
 keyboard.prevent.up([Key.LeftControl, Key.C], () => {
