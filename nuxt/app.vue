@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>{{ message }}</div>
+    <input type="text">
   </div>
 </template>
 
