@@ -27,7 +27,13 @@ const handlers: Handlers = {
 
 const pressedKeys = new Set<Key>();
 
+const isEditableElement = (element: Element): boolean => {
+  const editableElements = ['INPUT', 'TEXTAREA', '[contenteditable="true"]'];
+  return editableElements.some(selector => element.matches(selector));
+};
+
 const handleAll = (event: KeyboardEvent, type: "up" | "down"): void => {
+  if (isEditableElement(event.target as Element)) return;
   const allHandlers = handlers[type]["All"];
   if (allHandlers?.length) {
     allHandlers.forEach((eventHandler) => {
@@ -44,6 +50,7 @@ const handleAll = (event: KeyboardEvent, type: "up" | "down"): void => {
 };
 
 const onKeydown = (event: KeyboardEvent): void => {
+  if (isEditableElement(event.target as Element)) return;
   pressedKeys.add(event.code as Key);
   const pressedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(pressedArray);
@@ -64,6 +71,7 @@ const onKeydown = (event: KeyboardEvent): void => {
 };
 
 const onKeyup = (event: KeyboardEvent): void => {
+  if (isEditableElement(event.target as Element)) return;
   const releasedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(releasedArray);
   const keyHandlers = handlers.up[keyString];
