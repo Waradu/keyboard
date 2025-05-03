@@ -1,8 +1,9 @@
 ## How to use it
 
 ```ts
-import { Key } from "wrdu-keyboard/key";
+import { useKeyboard, Key } from "wrdu-keyboard";
 
+// Create keyboard
 const keyboard = useKeyboard();
 
 // Listen for "A".
