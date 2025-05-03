@@ -34,23 +34,35 @@ keyboard.listen(
 );
 
 // Listen for "D" but only 1 time.
-const unlisten = keyboard.listen(
-  [Key.Alt, Key.L],
+keyboard.listen(
+  [Key.D],
   (e) => {
     console.log("D key pressed");
   },
   { once: true },
 );
 
-// Stop listening for "D" again.
+// Listen for "E".
+const unlisten = keyboard.listen([Key.E], (e) => {
+  console.log("D key pressed");
+});
+
+// Stop listening for "E" again.
 unlisten();
 
-// Listen for every key.
 keyboard.listen([Key.All], (e) => {
   console.log("Anything pressed");
 });
 
-// Call this when "window" is available.
+// Listen for "F" only if the "runIfFocused" element is focused (the listener will not run if "runIfFocused" is null).
+keyboard.listen(
+  [Key.F],
+  (e) => {
+    console.log("F key pressed");
+  },
+  { runIfFocused: document.getElementById("test") },
+);
+
 keyboard.init();
 ```
 

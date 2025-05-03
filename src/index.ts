@@ -33,6 +33,13 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
     keyListeners.forEach((listener) => {
       if (listener.ignoreIfEditable && isEditableElement(event.target as Element)) return;
+      if (listener.runIfFocused === null) return;
+      if (
+        listener.runIfFocused &&
+        document?.activeElement &&
+        listener.runIfFocused !== document.activeElement
+      )
+        return;
       if (listener.prevent) event.preventDefault();
 
       listener.handler(event);

@@ -10,6 +10,10 @@ export interface Config {
    */
   ignoreIfEditable?: boolean;
   /**
+   * Only run listener if the `runIfFocused` element is focused.
+   */
+  runIfFocused?: HTMLElement | null;
+  /**
    * Only listen once and then remove the listener.
    */
   once?: boolean;
