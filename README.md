@@ -54,7 +54,7 @@ keyboard.listen([Key.All], (e) => {
   console.log("Anything pressed");
 });
 
-// Listen for "F" only if the "runIfFocused" element is focused (the listener will not run if "runIfFocused" is null).
+// Listen for "F" only if the "runIfFocused" element is focused.
 keyboard.listen(
   [Key.F],
   (e) => {
@@ -62,6 +62,11 @@ keyboard.listen(
   },
   { runIfFocused: document.getElementById("test") },
 );
+// IMPORTANT: if you define runIfFocused as undefined the listener will not work.
+// example configs: 
+// - { ... } -> listener will run, 
+// - { ..., runIfFocused: element } -> listener will run if element focused
+// - { ..., runIfFocused: undefined } -> listener will not run!!!
 
 keyboard.init();
 ```

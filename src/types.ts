@@ -11,6 +11,14 @@ export interface Config {
   ignoreIfEditable?: boolean;
   /**
    * Only run listener if the `runIfFocused` element is focused.
+   * 
+   * **IMPORTANT**: if you define runIfFocused as undefined the listener will not work.
+   * @example
+   * ```ts
+   * { ... } // listener will run,
+   * { ..., runIfFocused: element } // listener will run if element is focused
+   * { ..., runIfFocused: undefined } // listener will not run!!!
+   * ```
    */
   runIfFocused?: HTMLElement | null;
   /**

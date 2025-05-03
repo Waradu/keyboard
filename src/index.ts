@@ -86,6 +86,10 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 
   const listen = (keys: [Key, ...Key[]], handler: Handler, config: Config = {}) => {
+    if ("runIfFocused" in config && config.runIfFocused === undefined) {
+      config.runIfFocused = null;
+    }
+
     config = {
       prevent: false,
       ignoreIfEditable: false,
