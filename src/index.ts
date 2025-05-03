@@ -27,7 +27,13 @@ const handlers: Handlers = {
 
 const pressedKeys = new Set<Key>();
 
+const isEditableElement = (element: Element): boolean => {
+  const editableElements = ['INPUT', 'TEXTAREA', '[contenteditable="true"]'];
+  return editableElements.some(selector => element.matches(selector));
+};
+
 const handleAll = (event: KeyboardEvent, type: "up" | "down"): void => {
+  if (isEditableElement(event.target as Element)) return;
   const allHandlers = handlers[type]["All"];
   if (allHandlers?.length) {
     allHandlers.forEach((eventHandler) => {
@@ -37,12 +43,14 @@ const handleAll = (event: KeyboardEvent, type: "up" | "down"): void => {
         handlers[type]["All"] = (handlers[type]["All"] || []).filter(
           (h) => h !== eventHandler
         );
+        console.log(`Unregistered 'All' handler for ${type}`);
       }
     });
   }
 };
 
 const onKeydown = (event: KeyboardEvent): void => {
+  if (isEditableElement(event.target as Element)) return;
   pressedKeys.add(event.code as Key);
   const pressedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(pressedArray);
@@ -55,6 +63,7 @@ const onKeydown = (event: KeyboardEvent): void => {
         handlers.down[keyString] = (handlers.down[keyString] || []).filter(
           (h) => h !== eventHandler
         );
+        console.log(`Unregistered '${keyString}' handler for keydown`);
       }
     });
   }
@@ -62,6 +71,7 @@ const onKeydown = (event: KeyboardEvent): void => {
 };
 
 const onKeyup = (event: KeyboardEvent): void => {
+  if (isEditableElement(event.target as Element)) return;
   const releasedArray = Array.from(pressedKeys) as Key[];
   const keyString = getKeyString(releasedArray);
   const keyHandlers = handlers.up[keyString];
@@ -73,6 +83,7 @@ const onKeyup = (event: KeyboardEvent): void => {
         handlers.up[keyString] = (handlers.up[keyString] || []).filter(
           (h) => h !== eventHandler
         );
+        console.log(`Unregistered '${keyString}' handler for keyup`);
       }
     });
   }
@@ -84,6 +95,7 @@ const clear = (): void => {
   handlers.down = {};
   handlers.up = {};
   pressedKeys.clear();
+  console.log("Cleared all keyboard handlers");
 };
 
 const stop = (): void => {
@@ -96,10 +108,7 @@ const stop = (): void => {
 const init = (): void => {
   stop();
   if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
-    window.addEventListener("keydown", onKeydown);
-    window.addEventListener("keyup", onKeyup);
-  }
-  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    console.log("Initializing keyboard event listeners");
     window.addEventListener("keydown", onKeydown);
     window.addEventListener("keyup", onKeyup);
   }
@@ -118,11 +127,9 @@ const down = (keys: Key[], handler: Handler, config: Config = {}): void => {
     throw new Error("At least one key must be provided");
   }
   const key = getKeyString(keys);
-  if (!handlers.down[key]) {
-    handlers.down[key] = [];
-  }
   const { once = false, prevent = false } = config;
-  handlers.down[key].push({ handler, prevent, once });
+  handlers.down[key] = [{ handler, prevent, once }];
+  console.log(`Registered '${key}' handler for keydown`);
 };
 
 const up = (keys: Key[], handler: Handler, config: Config = {}): void => {
@@ -133,11 +140,9 @@ const up = (keys: Key[], handler: Handler, config: Config = {}): void => {
     throw new Error("At least one key must be provided");
   }
   const key = getKeyString(keys);
-  if (!handlers.up[key]) {
-    handlers.up[key] = [];
-  }
   const { once = false, prevent = false } = config;
-  handlers.up[key].push({ handler, prevent, once });
+  handlers.up[key] = [{ handler, prevent, once }];
+  console.log(`Registered '${key}' handler for keyup`);
 };
 
 export interface Keyboard {
