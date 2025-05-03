@@ -1,58 +1,34 @@
-# Dependencies
+# dependencies (bun install)
 node_modules
 
-# Logs
-*.log*
-
-# Temp directories
-.temp
-.tmp
-.cache
-
-# Yarn
-**/.yarn/cache
-**/.yarn/*state*
-
-# Generated dirs
+# output
+out
 dist
+*.tgz
 
-# Nuxt
-.nuxt
-.output
-.data
-.vercel_build_output
-.build-*
-.netlify
-
-# Env
-.env
-
-# Testing
-reports
+# code coverage
 coverage
 *.lcov
-.nyc_output
 
-# VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
-# Intellij idea
-*.iml
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
 .idea
 
-# OSX
+# Finder (MacOS) folder config
 .DS_Store
-.AppleDouble
-.LSOverride
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-playground/bun.lock
-bun.lockb
