@@ -1,9 +1,13 @@
 ## How to use it
 
-```ts
-import { useKeyboard, Key } from "wrdu-keyboard";
+```bash
+bun install @waradu/keyboard
+```
 
-// Create keyboard
+```ts
+import { useKeyboard, Key } from "@waradu/keyboard";
+
+// Create keyboard.
 const keyboard = useKeyboard();
 
 // Listen for "A".

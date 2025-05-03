@@ -1,5 +1,5 @@
 {
-  "name": "wrdu-keyboard",
+  "name": "@waradu/keyboard",
   "version": "4.0.1",
   "description": "Keyboard manager",
   "repository": "waradu/keyboard",
