@@ -1,6 +1,6 @@
 import { getKeyString, isEditableElement } from "./helper";
 import { Key } from "./keys";
-import type { Handler, Config, Handlers, KeyboardConfig } from "./types";
+import type { Handler, Config, Handlers, KeyboardConfig, Listener } from "./types";
 
 /**
  * Keyboard manager.
@@ -20,16 +20,35 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     log(`pressed '${event.code}'`);
 
     const pressedArray = Array.from(pressedKeys) as Key[];
-    const keyString = getKeyString(pressedArray);
-    const keyListeners = Array.from(
-      new Map(
-        [
-          ...(listeners["All"] ? listeners["All"] : []),
-          ...(listeners[keyString] ? listeners[keyString] : []),
-        ].map((listener) => [listener.id, listener]),
-      ).values(),
+    const actualKeyString = getKeyString(pressedArray);
+
+    const strippedArray = pressedArray.filter(
+      (code) => code !== "ShiftLeft" && code !== "ShiftRight",
     );
-    if (!keyListeners || keyListeners.length == 0) return;
+    const strippedKeyString = getKeyString(strippedArray);
+
+    const candidates: Listener[] = [];
+
+    if (listeners["All"]) {
+      candidates.push(...listeners["All"]);
+    }
+
+    if (listeners[actualKeyString]) {
+      candidates.push(...listeners[actualKeyString]);
+    }
+
+    if (strippedKeyString !== actualKeyString && listeners[strippedKeyString]) {
+      const ignoreCaseListeners = listeners[strippedKeyString].filter((l) => l.ignoreCase);
+      candidates.push(...ignoreCaseListeners);
+    }
+
+    if (candidates.length === 0) return;
+
+    const uniqueMap = new Map<string, Listener>();
+    for (const l of candidates) {
+      uniqueMap.set(l.id, l);
+    }
+    const keyListeners = Array.from(uniqueMap.values());
 
     keyListeners.forEach((listener) => {
       if (listener.ignoreIfEditable && isEditableElement(event.target as Element)) return;

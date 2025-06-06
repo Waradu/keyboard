@@ -11,8 +11,8 @@ export interface Config {
   ignoreIfEditable?: boolean;
   /**
    * Only run listener if the `runIfFocused` element is focused.
-   * 
-   * **IMPORTANT**: if you define runIfFocused as undefined the listener will not work.
+   *
+   * **IMPORTANT**: if you define runIfFocused as undefined or null the listener will not work.
    * @example
    * ```ts
    * { ... } // listener will run,
@@ -25,6 +25,10 @@ export interface Config {
    * Only listen once and then remove the listener.
    */
   once?: boolean;
+  /**
+   * Ignore casing for example 'A' | 'a'.
+   */
+  ignoreCase?: boolean;
 }
 
 export interface KeyboardConfig {
@@ -34,4 +38,5 @@ export interface KeyboardConfig {
   debug?: boolean;
 }
 
-export type Handlers = Record<string, (Config & { handler: Handler; id: string })[]>;
+export type Listener = Config & { handler: Handler; id: string };
+export type Handlers = Record<string, Listener[]>;
