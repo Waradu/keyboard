@@ -1,6 +1,6 @@
 {
   "name": "@waradu/keyboard",
-  "version": "4.3.0",
+  "version": "5.0.0",
   "description": "Keyboard manager",
   "repository": "waradu/keyboard",
   "homepage": "https://waradu.dev",
@@ -10,13 +10,20 @@
   "module": "./src/index.ts",
   "types": "./src/index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@nuxt/kit": "^4.0.2",
+    "@nuxt/schema": "^4.0.2",
+    "@types/bun": "latest",
+    "nuxt": "^4.0.2"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@types/node": "^22.15.3"
+    "@types/node": "^24.1.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./nuxt": "./src/nuxt/index.ts"
   },
   "keywords": [
     "keyboard",
