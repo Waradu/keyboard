@@ -10,7 +10,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   return {
     provide: {
-      keyboard,
+      keyboard: keyboard as Omit<typeof keyboard, "init">,
     },
   };
 });

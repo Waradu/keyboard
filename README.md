@@ -4,6 +4,8 @@
 bun install @waradu/keyboard
 ```
 
+Do not forget to call `keyboard.init();` once window is available.
+
 ```ts
 import { useKeyboard, Key } from "@waradu/keyboard";
 
@@ -69,6 +71,26 @@ keyboard.listen(
 // - { ..., runIfFocused: undefined } -> listener will not run!!!
 
 keyboard.init();
+```
+
+For nuxt user add the package to the modules in `nuxt.config.ts`:
+
+```ts
+export default defineNuxtConfig({
+  modules: ["@waradu/keyboard/nuxt"] // this also auto inits the keyboard on mounted
+});
+```
+
+and use it like this:
+
+```ts
+import { Key } from "@waradu/keyboard";
+
+const { $keyboard } = useNuxtApp();
+
+$keyboard.listen([Key.A], () => {
+  console.log("Pressed A");
+})
 ```
 
 You can find the complete list of available keys in the `src/keys.ts` file.
