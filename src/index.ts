@@ -3,7 +3,7 @@ import { Key } from "./keys";
 import type { Handler, Config, Handlers, KeyboardConfig, Listener } from "./types";
 
 /**
- * Keyboard manager.
+ * Create a keyboard listener.
  *
  * @param config Optional settings to configure the keyboard.
  */
@@ -60,6 +60,9 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       )
         return;
       if (listener.prevent) event.preventDefault();
+      if (listener.stop == true) event.stopPropagation();
+      if (listener.stop == "immediate") event.stopImmediatePropagation();
+      if (listener.stop == "both") { event.stopPropagation(); event.stopImmediatePropagation(); }
 
       listener.handler(event);
       log(`handled '${listener.id}'`);
@@ -111,6 +114,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
     config = {
       prevent: false,
+      stop: false,
       ignoreIfEditable: false,
       once: false,
       ...config,
