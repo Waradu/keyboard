@@ -14,7 +14,9 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options: ModuleOptions, nuxt: Nuxt) {
     const { resolve } = createResolver(import.meta.url);
 
-    nuxt.options.runtimeConfig.public.keyboard = options;
+    nuxt.options.runtimeConfig.public.keyboard = {
+      debug: options.debug ?? false
+    };
 
     addPlugin({
       src: resolve("./runtime/plugin"),
