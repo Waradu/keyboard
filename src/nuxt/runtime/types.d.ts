@@ -17,6 +17,6 @@ declare module '#app' {
 
 declare module 'nuxt/schema' {
   interface PublicRuntimeConfig {
-    keyboard: ModuleOptions;
+    keyboard: Partial<ModuleOptions>;
   }
 }

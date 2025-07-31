@@ -86,7 +86,7 @@ and use it like this:
 ```ts
 import { Key } from "@waradu/keyboard";
 
-useKeybind([Key.A], () => {
+useKeybind([Key.A], () => { // prefer this over $keyboard.listen as useKeybind will autoremove the listener on unmounted
   console.log("Pressed A");
 });
 ```

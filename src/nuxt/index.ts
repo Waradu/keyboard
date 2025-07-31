@@ -3,7 +3,7 @@ import type { Nuxt } from "@nuxt/schema";
 
 
 export interface ModuleOptions {
-  debug?: boolean;
+  debug?: boolean | undefined;
 }
 
 export default defineNuxtModule<ModuleOptions>({
