@@ -18,7 +18,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     addPlugin({
       src: resolve("./runtime/plugin"),
-      mode: "client",
     });
     addImports({
       as: "useKeybind",
