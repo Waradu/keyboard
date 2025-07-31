@@ -223,4 +223,4 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 };
 
-export { Key };
+export { Key, type Handler, type Config };
