@@ -50,6 +50,7 @@ export interface Config {
    * @default false
    */
   ignoreCase?: boolean;
+  signal?: AbortSignal;
 }
 
 export interface KeyboardConfig {
@@ -58,7 +59,8 @@ export interface KeyboardConfig {
    * @default false
    */
   debug?: boolean;
+  signal?: AbortSignal;
 }
 
-export type Listener = Config & { handler: Handler; id: string; };
+export type Listener = Config & { handler: Handler; id: string; off?: () => void; };
 export type Handlers = Record<string, Listener[]>;

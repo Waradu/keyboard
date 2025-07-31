@@ -8,6 +8,8 @@ import type { Handler, Config, Handlers, KeyboardConfig, Listener } from "./type
  * @param config Optional settings to configure the keyboard.
  */
 export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
+  const instanceSignal = config.signal;
+
   const log = (text: string) => {
     if (config.debug) console.log(`<KEYBOARD> ${text}`);
   };
@@ -51,7 +53,8 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     const keyListeners = Array.from(uniqueMap.values());
 
     keyListeners.forEach((listener) => {
-      if (listener.ignoreIfEditable && isEditableElement(event.target as Element)) return;
+      const t = event.target;
+      if (listener.ignoreIfEditable && t && t instanceof Element && isEditableElement(t)) return;
       if (listener.runIfFocused === null) return;
       if (
         listener.runIfFocused &&
@@ -60,9 +63,9 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       )
         return;
       if (listener.prevent) event.preventDefault();
-      if (listener.stop == true) event.stopPropagation();
-      if (listener.stop == "immediate") event.stopImmediatePropagation();
-      if (listener.stop == "both") { event.stopPropagation(); event.stopImmediatePropagation(); }
+      if (listener.stop === true) event.stopPropagation();
+      if (listener.stop === "immediate") event.stopImmediatePropagation();
+      if (listener.stop === "both") { event.stopPropagation(); event.stopImmediatePropagation(); }
 
       listener.handler(event);
       log(`handled '${listener.id}'`);
@@ -76,7 +79,15 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     log(`released '${event.code}'`);
   };
 
-  const clear = () => {
+  const onBlur = () => {
+    if (pressedKeys.size) {
+      pressedKeys.clear();
+      log("cleared due to blur");
+    }
+  };
+
+  const clear = (): void => {
+    for (const arr of Object.values(listeners)) for (const l of arr) l.off?.();
     listeners = {};
     pressedKeys.clear();
     log(`cleared`);
@@ -86,23 +97,45 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
       window.removeEventListener("keydown", onKeydown);
       window.removeEventListener("keyup", onKeyup);
+      window.removeEventListener("blur", onBlur);
     }
+
     log("stopped");
   };
 
-  const init = (): void => {
+  const destroy = (): void => {
+    stop();
+    clear();
+  };
+
+  const init = (opts?: { signal?: AbortSignal; }) => {
     stop();
     if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
       window.addEventListener("keydown", onKeydown);
       window.addEventListener("keyup", onKeyup);
+      window.addEventListener("blur", onBlur);
+
+      const abortSignal = opts?.signal ?? instanceSignal;
+      if (abortSignal) {
+        if (abortSignal.aborted) destroy();
+        else abortSignal.addEventListener("abort", destroy, { once: true });
+      }
+
       log("initialized");
     }
   };
 
   const unlisten = (id: string) => {
     Object.entries(listeners).forEach(([keyString]) => {
-      if (!listeners[keyString]) return;
-      listeners[keyString] = listeners[keyString].filter((c) => c.id !== id);
+      const arr = listeners[keyString];
+      if (!arr) return;
+      const keep: Listener[] = [];
+      for (const l of arr) {
+        if (l.id === id) l.off?.();
+        else keep.push(l);
+      }
+      if (keep.length) listeners[keyString] = keep;
+      else delete listeners[keyString];
     });
     log(`removed: '${id}'`);
   };
@@ -128,29 +161,43 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       throw new Error("At least one key must be provided");
     }
 
+    if (config.signal?.aborted) return () => { };
+
     const keyString = getKeyString(keys);
 
     const id = Math.random().toString(36).slice(2, 7);
 
+    const onAbort = () => unlisten(id);
+    if (config.signal) config.signal.addEventListener("abort", onAbort, { once: true });
+
     if (!listeners[keyString]) listeners[keyString] = [];
 
-    listeners[keyString].push({ ...config, handler, id });
+    listeners[keyString].push({ ...config, handler, id, off: () => config.signal?.removeEventListener("abort", onAbort) });
 
     log(`added '${keyString}' with id: '${id}'`);
 
-    return () => unlisten(id);
+    return () => {
+      if (config.signal) config.signal.removeEventListener("abort", onAbort);
+      unlisten(id);
+    };
   };
 
   return {
     /**
-     * Initialize the keyboard. Call this when `window` is available.
+     * Initialize the keyboard. Call this when `window` is available (it will fail silently).
      * You can define listeners bevore initializing.
      */
     init,
     /**
-     * Stop listening.
+     * Removes all event handlers.
+     * To re-enable listening after calling this, call `init()` again.
      */
     stop,
+    /**
+     * Removes all event handlers and clears any stored key state.
+     * Use this if you are not planning to re-enable listening with `init()` after.
+     */
+    destroy,
     /**
      * Clear all listeners.
      */
