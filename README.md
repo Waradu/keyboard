@@ -65,8 +65,8 @@ keyboard.listen(
   { runIfFocused: document.getElementById("test") },
 );
 // IMPORTANT: if you define runIfFocused as undefined the listener will not work.
-// example configs: 
-// - { ... } -> listener will run, 
+// example configs:
+// - { ... } -> listener will run,
 // - { ..., runIfFocused: element } -> listener will run if element focused
 // - { ..., runIfFocused: undefined } -> listener will not run!!!
 
@@ -77,7 +77,7 @@ For nuxt user add the package to the modules in `nuxt.config.ts`:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["@waradu/keyboard/nuxt"] // this also auto inits the keyboard on mounted
+  modules: ["@waradu/keyboard/nuxt"], // this also auto inits the keyboard on mounted
 });
 ```
 
@@ -86,11 +86,17 @@ and use it like this:
 ```ts
 import { Key } from "@waradu/keyboard";
 
+useKeybind([Key.A], () => {
+  console.log("Pressed A");
+});
+```
+
+If you need to access the useKeyboard model use:
+
+```ts
 const { $keyboard } = useNuxtApp();
 
-$keyboard.listen([Key.A], () => {
-  console.log("Pressed A");
-})
+$keyboard.destroy();
 ```
 
 You can find the complete list of available keys in the `src/keys.ts` file.

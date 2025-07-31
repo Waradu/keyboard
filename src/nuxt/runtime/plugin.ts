@@ -1,8 +1,12 @@
 import { useKeyboard } from "@waradu/keyboard";
-import { defineNuxtPlugin } from "nuxt/app";
+import { defineNuxtPlugin, useRuntimeConfig } from "nuxt/app";
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const keyboard = useKeyboard();
+  const { public: { keyboard: opts } } = useRuntimeConfig();
+
+  const keyboard = useKeyboard({
+    debug: opts.debug
+  });
 
   nuxtApp.hook('app:mounted', () => {
     keyboard.init();
@@ -10,7 +14,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   return {
     provide: {
-      keyboard: keyboard as Omit<typeof keyboard, "init">,
+      keyboard,
     },
   };
 });

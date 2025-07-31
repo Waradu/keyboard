@@ -1,11 +1,29 @@
-import { defineNuxtModule, addPlugin, createResolver } from '@nuxt/kit';
-import type { ModuleOptions, Nuxt } from '@nuxt/schema';
+import { defineNuxtModule, addPlugin, createResolver, addImports } from "@nuxt/kit";
+import type { Nuxt } from "@nuxt/schema";
+
+
+export interface ModuleOptions {
+  debug?: boolean;
+}
 
 export default defineNuxtModule<ModuleOptions>({
-  meta: { name: '@waradu/keyboard/nuxt', configKey: 'keyboard' },
-  defaults: {},
-  setup(_options: ModuleOptions, nuxt: Nuxt) {
+  meta: { name: "@waradu/keyboard/nuxt", configKey: "keyboard" },
+  defaults: {
+    debug: false
+  },
+  setup(options: ModuleOptions, nuxt: Nuxt) {
     const { resolve } = createResolver(import.meta.url);
-    addPlugin(resolve('./runtime/plugin'));
+
+    nuxt.options.runtimeConfig.public.keyboard = options;
+
+    addPlugin({
+      src: resolve("./runtime/plugin"),
+      mode: "client",
+    });
+    addImports({
+      as: "useKeybind",
+      name: "useKeybind",
+      from: resolve("./runtime/composable")
+    });
   }
 });
