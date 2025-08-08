@@ -1,6 +1,6 @@
 {
   "name": "@waradu/keyboard",
-  "version": "5.3.3",
+  "version": "5.3.4",
   "description": "Keyboard manager",
   "repository": {
     "type": "git",
@@ -16,13 +16,11 @@
     "@nuxt/kit": "^4.0.2",
     "@nuxt/schema": "^4.0.2",
     "@types/bun": "latest",
+    "@types/node": "^24.2.0",
     "nuxt": "^4.0.2"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@types/node": "^24.1.0"
   },
   "exports": {
     ".": "./src/index.ts",
