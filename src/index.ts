@@ -39,9 +39,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
           continue;
         }
 
-        if (!Array.from(pressedModifiers).every((modifier) => {
-          mods.includes(modifier);
-        })) {
+        if (Array.from(pressedModifiers).length !== mods.length || !Array.from(pressedModifiers).every((modifier) => mods.includes(modifier))) {
           continue;
         }
 
