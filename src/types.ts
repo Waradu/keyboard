@@ -30,13 +30,13 @@ export interface Config {
    */
   ignoreIfEditable?: boolean;
   /**
-   * Only run listener if the `runIfFocused` element is focused.
+   * Only run listener if one of the `runIfFocused` elements is focused.
    *
    * **IMPORTANT**: if runIfFocused is null the listener will not run.
    * @example
    * ```ts
    * { ... } // listener will run,
-   * { ..., runIfFocused: element } // listener will run if element is focused
+   * { ..., runIfFocused: [element, element] } // listener will run if one of the elements is focused
    * { ..., runIfFocused: null } // listener will not run!
    * ```
    */

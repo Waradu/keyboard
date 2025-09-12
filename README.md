@@ -1,112 +1,36 @@
-## How to use it
+## Keyboard Manager
+
+### Install
 
 ```bash
 bun install @waradu/keyboard
 ```
 
-Do not forget to call `keyboard.init();` once window is available.
+### Get Started
+
+Start by importing `useKeyboard` and create a new keyboard instance.
 
 ```ts
 import { useKeyboard } from "@waradu/keyboard";
 
-// Create keyboard.
 const keyboard = useKeyboard();
-
-// Listen for "A".
-keyboard.listen({
-  keys: ["a"],
-  run() {
-    console.log("A key pressed");
-  },
-});
-
-// Listen for "Meta" + "Control" + "A" (use typescript to get auto recommendations).
-keyboard.listen({
-  keys: ["meta_control_a"],
-  run() {
-    console.log("A key pressed");
-  },
-});
-/*
-The order does not matter except the actual key has to be last.
-"a_control": No
-"control_a_shift": No
-"control_shift_a": Yes
-"alt_shift_space": Yes
-"meta_shift_1": Yes
-*/
-
-// Listen for "B" and call prevent default.
-keyboard.listen({
-  keys: ["b"],
-  run() {
-    console.log("B key pressed");
-  },
-  config: { prevent: true },
-});
-
-// Listen for "C" unless an editable element like input is focused.
-keyboard.listen({
-  keys: ["c"],
-  run() {
-    console.log("C key pressed");
-  },
-  config: { ignoreIfEditable: true },
-});
-
-// Listen for "D" but only 1 time.
-keyboard.listen({
-  keys: ["d"],
-  run() {
-    console.log("D key pressed");
-  },
-  config: { once: true },
-});
-
-// Listen for "E".
-const unlisten = keyboard.listen({
-  keys: ["E"],
-  run() {
-    console.log("E key pressed");
-  },
-});
-
-// Stop listening for "E" again.
-unlisten();
-
-// Listen for any key press.
-keyboard.listen({
-  keys: ["any"],
-  run() {
-    console.log("Anything pressed");
-  },
-});
-
-// Listen for "F" only if the "runIfFocused" element is focused.
-keyboard.listen({
-  keys: ["f"],
-  run() {
-    console.log("F key pressed");
-  },
-  config: { runIfFocused: document.getElementById("test") },
-});
-
-keyboard.init();
 ```
 
-For nuxt user add the package to the modules in `nuxt.config.ts`:
+### Nuxt
+
+Nuxt users can use the built-in module that automatically creates and initializes a keyboard instance. It also cleans up listeners when the component unmounts.
+
+First add the package to the modules in `nuxt.config.ts`:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["@waradu/keyboard/nuxt"], // this also auto inits the keyboard on mounted
+  modules: ["@waradu/keyboard/nuxt"],
 });
 ```
 
-and use it like this:
+And then use it like this:
 
 ```ts
-import { Key } from "@waradu/keyboard";
-
 useKeybind({
   keys: ["a"],
   run() {
@@ -115,7 +39,7 @@ useKeybind({
 });
 ```
 
-If you need to access the useKeyboard model use:
+If you need to access the useKeyboard instance use the nuxt plugin.
 
 ```ts
 const { $keyboard } = useNuxtApp();
@@ -123,7 +47,107 @@ const { $keyboard } = useNuxtApp();
 $keyboard.destroy();
 ```
 
-# v6 Changes:
+### Usage
+
+Do not forget to call `keyboard.init();` once window is available.
+
+A listener can be really simple. You just need one or more [key sequences](#key-sequence), a [handler](#handler) and the [config](#config) (optional).
+
+```ts
+const unlisten = keyboard.listen({
+  keys: ["control_y", "control_shift_z"], // key sequences
+  run() {
+    // handler
+    console.log("redo");
+  },
+  config: {
+    // config
+  },
+});
+```
+
+`keyboard.listen` returns a unlisten function that can be called to remove the listener.
+
+```ts
+const unlisten = keyboard.listen(...);
+unlisten();
+```
+
+### Key Sequence
+
+Key sequences are just strings of characters defining the key that needs to be pressed to activate the listener. A listener can have multiple key sequences.
+
+The structure looks like this (`?` = optional, `!` = required):
+`"(meta_)?(control_)?(alt_)?(shift_)?(key)!"` or `"any"`
+
+Meta is the equivalent of `windows key` on windows or `cmd` on macos.
+The order is fixed, the `key` will always come last, `control` always after `meta` etc. The modifiers are not required.
+
+Some example to get a better understanding:
+
+- `"meta_control_alt_shift_arrow-up"`: ✅
+- `"control_x"`: ✅
+- `"t"`: ✅
+- `"any"`: ✅ (catch all)
+- `""`: ❌ (empty string)
+- `"shift_alt_y"`: ❌ (`shift` comes after `alt`)
+- `"meta_control"`: ❌ (`key` is required)
+- `"xy"`: ❌ (only one `key` at a time)
+
+Why move from the old way (`[Key.Control, Key.X]`)?
+
+1. It does not require the import of a seperate property.
+2. A valid key sequence is enforced (`[Key.X, Key.X]` was valid).
+3. The order is fixed so it is more consistent.
+4. Easier to read.
+
+### Handler
+
+The handler is a function that runs when the key sequence is pressed.
+
+```ts
+keyboard.listen({
+  ...
+  run(event) {
+    console.log("test");
+  },
+  // or with an arrow function:
+  run: (event) => {
+    console.log("test");
+  },
+  ...
+});
+```
+
+### Config
+
+You can configure and change the behavior of the listener. All keys are optional.
+
+```ts
+keyboard.listen({
+  ...
+  config: {
+    // Remove the listener after one run.
+    once: true,
+
+    // Ignore the listener if any text element like input is focused.
+    ignoreIfEditable: true,
+
+    // A list of elements which one has to be focused for the listener to run.
+    runIfFocused: [...],
+
+    // Call preventDefault() before run.
+    prevent: true,
+
+    // Call stopPropagation() before run. (use "immediate" for stopImmediatePropagation() and "both" for both).
+    stop: true,
+  }
+});
+```
+
+Also you can pass a `signal` to the config or the useKeyboard to abort them with a `signal`.
+
+### v6 Changes:
 
 - Use `e.key` instead of `e.code`
 - Multiple Keybinds per listener
