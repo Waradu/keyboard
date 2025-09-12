@@ -124,6 +124,9 @@ keyboard.listen({
 You can configure and change the behavior of the listener. All keys are optional.
 
 ```ts
+const emailInput = document.getElementById("passwordInput"); // Normal
+const passwordInput = useTemplateRef("passwordInput"); // Nuxt
+
 keyboard.listen({
   ...
   config: {
@@ -134,7 +137,7 @@ keyboard.listen({
     ignoreIfEditable: true,
 
     // A list of elements which one has to be focused for the listener to run.
-    runIfFocused: [...],
+    runIfFocused: [emailInput, passwordInput],
 
     // Call preventDefault() before run.
     prevent: true,
@@ -147,7 +150,7 @@ keyboard.listen({
 
 Also you can pass a `signal` to the config or the useKeyboard to abort them with a `signal`.
 
-### v6 Changes:
+### v6 Changes
 
 - Use `e.key` instead of `e.code`
 - Multiple Keybinds per listener
@@ -156,3 +159,12 @@ Also you can pass a `signal` to the config or the useKeyboard to abort them with
 - Ignore `event.isComposing` and Dead keys
 - Remove `ignoreCase`
 - Restructure
+
+### Development
+
+Use [bun](https://bun.sh).
+
+1. `bun install`
+2. `cd playground`
+3. `bun install`
+4. 👍
