@@ -1,5 +1,17 @@
 ## Keyboard Manager
 
+[![testing](https://github.com/Waradu/keyboard/actions/workflows/testing.yml/badge.svg)](https://github.com/Waradu/keyboard/actions/workflows/testing.yml)
+
+- [Install](#install)
+- [Get Started](#get-started)
+- [Nuxt](#nuxt)
+- [Usage](#usage)
+- [Key Sequence](#key-sequence)
+- [Handler](#handler)
+- [Config](#config)
+- [v6 Changes](#v6-changes)
+- [Development](#development)
+
 ### Install
 
 ```bash
