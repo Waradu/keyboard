@@ -97,6 +97,9 @@ export const keys = {
   "/": "slash",
   "`": "backquote",
   "~": "tilde",
+  "$": "dollar",
+  "?": "question-mark",
+  "!": "exclamation-mark",
 } as const;
 
 export const modifiers = {
