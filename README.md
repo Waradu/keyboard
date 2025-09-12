@@ -123,11 +123,12 @@ const { $keyboard } = useNuxtApp();
 $keyboard.destroy();
 ```
 
-# v6 Roadmap
+# v6 Changes:
 
-- [x] Use `e.key` instead of `e.code`
-- [x] Multiple Keybinds per listener
-- [x] Remove the need to use `Key.*`
-- [x] Rewrite `runIfFocused` to `elements` to allow multiple targets
-- [x] Ignore `event.isComposing` and Dead keys
-- [x] Remove `ignoreCase`
+- Use `e.key` instead of `e.code`
+- Multiple Keybinds per listener
+- Remove the need to use `Key.*`
+- Rewrite `runIfFocused` to `elements` to allow multiple targets
+- Ignore `event.isComposing` and Dead keys
+- Remove `ignoreCase`
+- Restructure
