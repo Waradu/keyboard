@@ -104,9 +104,9 @@ You can find the complete list of available keys in the `src/keys.ts` file.
 
 ## v4 Roadmap
 
-- [ ] Use `e.key` instead of `e.code`
-- [ ] Multiple Keybinds per listener
-- [ ] Remove the need to use `Key.*`
-- [ ] Rewrite `runIfFocused` to `elements` to allow multiple targets
-- [ ] Ignore `event.isComposing` and Dead keys
-- [ ] Remove `ignoreCase`
+- [x] Use `e.key` instead of `e.code`
+- [x] Multiple Keybinds per listener
+- [x] Remove the need to use `Key.*`
+- [x] Rewrite `runIfFocused` to `elements` to allow multiple targets
+- [x] Ignore `event.isComposing` and Dead keys
+- [x] Remove `ignoreCase`

@@ -1,6 +1,6 @@
-import { getKeyString, isEditableElement } from "./helper";
-import { Key } from "./keys";
-import type { Handler, Config, Handlers, KeyboardConfig, Listener } from "./types";
+import { isEditableElement } from "./helper";
+import { keys, modifiers, type KeyKey, type KeyString, type KeyValue, type ModifierKey, type ModifierValue } from "./keys";
+import type { Config, Handlers, KeyboardConfig, Handler, Listener, Options } from "./types";
 
 /**
  * Create a keyboard listener.
@@ -9,87 +9,104 @@ import type { Handler, Config, Handlers, KeyboardConfig, Listener } from "./type
  */
 export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   const instanceSignal = config.signal;
+  let listeners: Handlers = [];
+
+  const pressedKeys = new Set<KeyValue>();
+  const pressedModifiers = new Set<ModifierValue>();
 
   const log = (text: string) => {
     if (config.debug) console.log(`<KEYBOARD> ${text}`);
   };
 
-  let listeners: Handlers = {};
-  const pressedKeys = new Set<Key>();
-
   const onKeydown = (event: KeyboardEvent): void => {
-    pressedKeys.add(event.code as Key);
-    log(`pressed '${event.code}'`);
+    if (event.isComposing) return;
 
-    const pressedArray = Array.from(pressedKeys) as Key[];
-    const actualKeyString = getKeyString(pressedArray);
+    const k = event.key.toLowerCase();
 
-    const strippedArray = pressedArray.filter(
-      (code) => code !== "ShiftLeft" && code !== "ShiftRight",
-    );
-    const strippedKeyString = getKeyString(strippedArray);
-
-    const candidates: Listener[] = [];
-
-    if (listeners["All"]) {
-      candidates.push(...listeners["All"]);
+    if (modifiers[k as ModifierKey]) {
+      pressedModifiers.add(modifiers[k as ModifierKey]);
+    } else if (keys[k as KeyKey]) {
+      pressedKeys.add(keys[k as KeyKey]);
     }
 
-    if (listeners[actualKeyString]) {
-      candidates.push(...listeners[actualKeyString]);
-    }
+    const candidates = listeners.filter((l) => {
+      for (const key of l.keys) {
+        if (key == "any") return true;
 
-    if (strippedKeyString !== actualKeyString && listeners[strippedKeyString]) {
-      const ignoreCaseListeners = listeners[strippedKeyString].filter((l) => l.ignoreCase);
-      candidates.push(...ignoreCaseListeners);
-    }
+        let [k, ...mods] = key.split("_").reverse() as [KeyValue, ...ModifierValue[]];
+
+        if (!Array.from(pressedKeys).includes(k)) {
+          continue;
+        }
+
+        if (!Array.from(pressedModifiers).every((modifier) => {
+          mods.includes(modifier);
+        })) {
+          continue;
+        }
+
+        return true;
+      }
+
+      return false;
+    });
 
     if (candidates.length === 0) return;
 
-    const uniqueMap = new Map<string, Listener>();
-    for (const l of candidates) {
-      uniqueMap.set(l.id, l);
-    }
-    const keyListeners = Array.from(uniqueMap.values());
-
-    keyListeners.forEach((listener) => {
+    candidates.forEach((listener) => {
       const t = event.target;
-      if (listener.ignoreIfEditable && t && t instanceof Element && isEditableElement(t)) return;
-      if (listener.runIfFocused === null) return;
-      if (
-        listener.runIfFocused &&
-        document?.activeElement &&
-        listener.runIfFocused !== document.activeElement
-      )
-        return;
-      if (listener.prevent) event.preventDefault();
-      if (listener.stop === true) event.stopPropagation();
-      if (listener.stop === "immediate") event.stopImmediatePropagation();
-      if (listener.stop === "both") { event.stopPropagation(); event.stopImmediatePropagation(); }
+
+      if (listener.config?.ignoreIfEditable && t && t instanceof Element && isEditableElement(t)) return;
+
+      if (listener.config?.runIfFocused) {
+        const run = listener.config?.runIfFocused;
+
+        if (Array.isArray(run)) {
+          if (run.length == 0) return;
+
+          if (!run.some(element => {
+            return element && document.activeElement && element == document.activeElement;
+          })) return;
+        }
+      };
+
+      if (listener.config?.prevent) event.preventDefault();
+      if (listener.config?.stop === true) event.stopPropagation();
+      if (listener.config?.stop === "immediate") event.stopImmediatePropagation();
+      if (listener.config?.stop === "both") { event.stopPropagation(); event.stopImmediatePropagation(); }
 
       listener.handler(event);
       log(`handled '${listener.id}'`);
 
-      if (listener.once) unlisten(listener.id);
+      if (listener.config?.once) unlisten(listener.id);
     });
   };
 
   const onKeyup = (event: KeyboardEvent): void => {
-    pressedKeys.delete(event.code as Key);
-    log(`released '${event.code}'`);
+    if (event.isComposing) return;
+
+    const k = event.key.toLowerCase();
+
+    if (modifiers[k as ModifierKey]) {
+      pressedModifiers.delete(modifiers[k as ModifierKey]);
+    } else if (keys[k as KeyKey]) {
+      pressedKeys.delete(keys[k as KeyKey]);
+    }
+
+    log(`released '${k}'`);
   };
 
   const onBlur = () => {
-    if (pressedKeys.size) {
-      pressedKeys.clear();
-      log("cleared due to blur");
-    }
+    pressedKeys.clear();
+    pressedModifiers.clear();
+    log("cleared due to blur");
   };
 
   const clear = (): void => {
-    for (const arr of Object.values(listeners)) for (const l of arr) l.off?.();
-    listeners = {};
+    for (const l of listeners) l.off?.();
+    listeners = [];
     pressedKeys.clear();
+    pressedModifiers.clear();
     log(`cleared`);
   };
 
@@ -126,55 +143,48 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 
   const unlisten = (id: string) => {
-    Object.entries(listeners).forEach(([keyString]) => {
-      const arr = listeners[keyString];
-      if (!arr) return;
-      const keep: Listener[] = [];
-      for (const l of arr) {
-        if (l.id === id) l.off?.();
-        else keep.push(l);
-      }
-      if (keep.length) listeners[keyString] = keep;
-      else delete listeners[keyString];
-    });
-    log(`removed: '${id}'`);
+    const index = listeners.findIndex(l => l.id === id);
+    if (index !== -1 && listeners[index]) {
+      listeners[index].off();
+      listeners.splice(index, 1);
+      log(`removed: '${id}'`);
+    }
   };
 
-  const listen = (keys: [Key, ...Key[]], handler: Handler, config: Config = {}) => {
-    if ("runIfFocused" in config && config.runIfFocused === undefined) {
-      config.runIfFocused = null;
+  const listen = (options: Options) => {
+    if (options.config && "runIfFocused" in options.config && options.config.runIfFocused === undefined) {
+      log("'runIfFocused' is explicitly set to 'undefined'. Was that intentional?");
     }
 
-    config = {
+    const config: Config = {
       prevent: false,
       stop: false,
       ignoreIfEditable: false,
       once: false,
-      ...config,
+      ...options.config,
     };
 
-    if (keys.includes(Key.All)) {
-      keys = [Key.All];
+    if (options.keys.includes("any")) {
+      options.keys = ["any"];
     }
 
-    if (keys.length === 0) {
-      throw new Error("At least one key must be provided");
-    }
-
-    if (config.signal?.aborted) return () => { };
-
-    const keyString = getKeyString(keys);
+    if (options?.config?.signal?.aborted) return () => { };
 
     const id = Math.random().toString(36).slice(2, 7);
 
     const onAbort = () => unlisten(id);
-    if (config.signal) config.signal.addEventListener("abort", onAbort, { once: true });
+    if (options?.config?.signal) options.config.signal.addEventListener("abort", onAbort, { once: true });
 
-    if (!listeners[keyString]) listeners[keyString] = [];
+    listeners.push({
+      id,
+      off: () => config.signal?.removeEventListener("abort", onAbort),
 
-    listeners[keyString].push({ ...config, handler, id, off: () => config.signal?.removeEventListener("abort", onAbort) });
+      keys: options.keys,
+      handler: options.run,
+      config: options.config
+    });
 
-    log(`added '${keyString}' with id: '${id}'`);
+    log(`added '${options.keys.join(", ")}' with id: '${id}'`);
 
     return () => {
       if (config.signal) config.signal.removeEventListener("abort", onAbort);
@@ -223,4 +233,4 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 };
 
-export { Key, type Handler, type Config };
+export { type Config, type KeyString, type Options };
