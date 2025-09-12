@@ -7,68 +7,89 @@ bun install @waradu/keyboard
 Do not forget to call `keyboard.init();` once window is available.
 
 ```ts
-import { useKeyboard, Key } from "@waradu/keyboard";
+import { useKeyboard } from "@waradu/keyboard";
 
 // Create keyboard.
 const keyboard = useKeyboard();
 
 // Listen for "A".
-keyboard.listen([Key.A], (e) => {
-  console.log("A key pressed");
+keyboard.listen({
+  keys: ["a"],
+  run() {
+    console.log("A key pressed");
+  },
 });
 
+// Listen for "Meta" + "Control" + "A" (use typescript to get auto recommendations).
+keyboard.listen({
+  keys: ["meta_control_a"],
+  run() {
+    console.log("A key pressed");
+  },
+});
+/*
+The order does not matter except the actual key has to be last.
+"a_control": No
+"control_a_shift": No
+"control_shift_a": Yes
+"alt_shift_space": Yes
+"meta_shift_1": Yes
+*/
+
 // Listen for "B" and call prevent default.
-keyboard.listen(
-  [Key.B],
-  (e) => {
+keyboard.listen({
+  keys: ["b"],
+  run() {
     console.log("B key pressed");
   },
-  { prevent: true },
-);
+  config: { prevent: true },
+});
 
 // Listen for "C" unless an editable element like input is focused.
-keyboard.listen(
-  [Key.C],
-  (e) => {
+keyboard.listen({
+  keys: ["c"],
+  run() {
     console.log("C key pressed");
   },
-  { ignoreIfEditable: true },
-);
+  config: { ignoreIfEditable: true },
+});
 
 // Listen for "D" but only 1 time.
-keyboard.listen(
-  [Key.D],
-  (e) => {
+keyboard.listen({
+  keys: ["d"],
+  run() {
     console.log("D key pressed");
   },
-  { once: true },
-);
+  config: { once: true },
+});
 
 // Listen for "E".
-const unlisten = keyboard.listen([Key.E], (e) => {
-  console.log("D key pressed");
+const unlisten = keyboard.listen({
+  keys: ["E"],
+  run() {
+    console.log("E key pressed");
+  },
 });
 
 // Stop listening for "E" again.
 unlisten();
 
-keyboard.listen([Key.All], (e) => {
-  console.log("Anything pressed");
+// Listen for any key press.
+keyboard.listen({
+  keys: ["any"],
+  run() {
+    console.log("Anything pressed");
+  },
 });
 
 // Listen for "F" only if the "runIfFocused" element is focused.
-keyboard.listen(
-  [Key.F],
-  (e) => {
+keyboard.listen({
+  keys: ["f"],
+  run() {
     console.log("F key pressed");
   },
   { runIfFocused: document.getElementById("test") },
-);
-// IMPORTANT: if you define runIfFocused as undefined the listener will not work.
-// example configs:
-// - { ... } -> listener will run,
-// - { ..., runIfFocused: element } -> listener will run if element focused
-// - { ..., runIfFocused: undefined } -> listener will not run!!!
+});
 
 keyboard.init();
 ```
@@ -86,9 +107,11 @@ and use it like this:
 ```ts
 import { Key } from "@waradu/keyboard";
 
-useKeybind([Key.A], () => {
-  // prefer this over $keyboard.listen as useKeybind will autoremove the listener on unmounted
-  console.log("Pressed A");
+useKeybind({
+  keys: ["a"],
+  run() {
+    console.log("A key pressed");
+  },
 });
 ```
 
@@ -100,13 +123,11 @@ const { $keyboard } = useNuxtApp();
 $keyboard.destroy();
 ```
 
-You can find the complete list of available keys in the `src/keys.ts` file.
+# v6 Roadmap
 
-## v4 Roadmap
-
-- [ ] Use `e.key` instead of `e.code`
-- [ ] Multiple Keybinds per listener
-- [ ] Remove the need to use `Key.*`
-- [ ] Rewrite `runIfFocused` to `elements` to allow multiple targets
-- [ ] Ignore `event.isComposing` and Dead keys
-- [ ] Remove `ignoreCase`
+- [x] Use `e.key` instead of `e.code`
+- [x] Multiple Keybinds per listener
+- [x] Remove the need to use `Key.*`
+- [x] Rewrite `runIfFocused` to `elements` to allow multiple targets
+- [x] Ignore `event.isComposing` and Dead keys
+- [x] Remove `ignoreCase`

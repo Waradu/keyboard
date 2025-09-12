@@ -1,15 +1,12 @@
 import { onBeforeUnmount } from 'vue';
-import type { Handler, Config, useKeyboard } from '@waradu/keyboard';
-import { Key } from '@waradu/keyboard';
+import type { Options, useKeyboard } from '@waradu/keyboard';
 import { useNuxtApp } from "nuxt/app";
 
 export function useKeybind(
-  keys: [Key, ...Key[]],
-  handler: Handler,
-  config?: Config
+  options: Options
 ) {
   const { $keyboard } = useNuxtApp() as unknown as { $keyboard: ReturnType<typeof useKeyboard>; };
-  const off = $keyboard.listen(keys, handler, config);
+  const off = $keyboard.listen(options);
   onBeforeUnmount(() => {
     off();
   });

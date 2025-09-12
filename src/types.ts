@@ -1,3 +1,5 @@
+import type { KeyString } from "./keys";
+
 export type Handler = (event: KeyboardEvent) => void;
 
 export interface Config {
@@ -30,26 +32,21 @@ export interface Config {
   /**
    * Only run listener if the `runIfFocused` element is focused.
    *
-   * **IMPORTANT**: if you define runIfFocused as undefined or null the listener will not work.
+   * **IMPORTANT**: if runIfFocused is null the listener will not run.
    * @example
    * ```ts
    * { ... } // listener will run,
    * { ..., runIfFocused: element } // listener will run if element is focused
-   * { ..., runIfFocused: undefined } // listener will not run!
    * { ..., runIfFocused: null } // listener will not run!
    * ```
    */
-  runIfFocused?: HTMLElement | null;
+  runIfFocused?: (HTMLElement | null)[];
   /**
    * Only listen once and then remove the listener.
    * @default false
    */
   once?: boolean;
-  /**
-   * Ignore casing for example 'A' | 'a'.
-   * @default false
-   */
-  ignoreCase?: boolean;
+
   signal?: AbortSignal;
 }
 
@@ -59,8 +56,22 @@ export interface KeyboardConfig {
    * @default false
    */
   debug?: boolean;
+
   signal?: AbortSignal;
 }
 
-export type Listener = Config & { handler: Handler; id: string; off?: () => void; };
-export type Handlers = Record<string, Listener[]>;
+export type Listener = {
+  id: string;
+  off: () => void;
+
+  keys: KeyString[];
+  handler: Handler;
+  config?: Config;
+};
+export type Handlers = Listener[];
+
+export interface Options {
+  keys: KeyString[];
+  run: Handler;
+  config?: Config;
+}
