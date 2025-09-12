@@ -85,9 +85,9 @@ The order is fixed, the `key` will always come last, `control` always after `met
 
 Some example to get a better understanding:
 
-- `"meta_control_alt_shift_arrow-up"`: ✅
 - `"control_x"`: ✅
-- `"t"`: ✅
+- `"meta_control_alt_shift_arrow-up"`: ✅
+- `"c"`: ✅
 - `"any"`: ✅ (catch all)
 - `""`: ❌ (empty string)
 - `"shift_alt_y"`: ❌ (`shift` comes after `alt`)

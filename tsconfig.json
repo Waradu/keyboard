@@ -24,7 +24,10 @@
     "paths": {
       "@waradu/keyboard": [
         "src/index.ts"
-      ]
+      ],
     },
-  }
+  },
+  "exclude": [
+    "playground"
+  ]
 }

@@ -52,9 +52,9 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     if (candidates.length === 0) return;
 
     candidates.forEach((listener) => {
-      const t = event.target;
+      const activeElement = document.activeElement;
 
-      if (listener.config?.ignoreIfEditable && t && t instanceof Element && isEditableElement(t)) return;
+      if (listener.config?.ignoreIfEditable && activeElement && activeElement instanceof Element && isEditableElement(activeElement)) return;
 
       if (listener.config?.runIfFocused) {
         const run = listener.config?.runIfFocused;
