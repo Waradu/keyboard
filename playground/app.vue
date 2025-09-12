@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 useKeybind({
-  keys: ["alt_a"],
+  keys: ["meta_control_shift_a"],
   run() {
     console.log("RUN");
   },

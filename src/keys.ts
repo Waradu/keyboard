@@ -115,11 +115,18 @@ export type KeyKey = keyof typeof keys;
 export type ModifierValue = (typeof modifiers)[keyof typeof modifiers];
 export type KeyValue = (typeof keys)[keyof typeof keys];
 
-type NonEmptyPermutations<T, U = T> = [T] extends [never]
-  ? never
-  : T extends U
-  ? [T] | [T, ...NonEmptyPermutations<Exclude<U, T>>]
-  : never;
+type FixedCombinations<
+  T extends readonly string[],
+  Acc extends string[] = []
+> = T extends [infer F extends string, ...infer R extends string[]]
+  ? | FixedCombinations<R, Acc>
+    | FixedCombinations<R, [...Acc, F]>
+  : Acc;
+
+type PrefixTuples = Exclude<
+  FixedCombinations<["meta", "control", "alt", "shift"]>,
+  []
+>;
 
 type Join<T extends readonly string[], Sep extends string> = T extends []
   ? ""
@@ -129,7 +136,6 @@ type Join<T extends readonly string[], Sep extends string> = T extends []
   ? `${F}${Sep}${Join<R, Sep>}`
   : string;
 
-type PrefixTuples = NonEmptyPermutations<ModifierValue>;
 type WithPrefix = `${Join<PrefixTuples, "_">}_${KeyValue}`;
 
 export type KeyString = KeyValue | WithPrefix | "any";

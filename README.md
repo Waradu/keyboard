@@ -88,7 +88,7 @@ keyboard.listen({
   run() {
     console.log("F key pressed");
   },
-  { runIfFocused: document.getElementById("test") },
+  config: { runIfFocused: document.getElementById("test") },
 });
 
 keyboard.init();
