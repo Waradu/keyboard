@@ -86,7 +86,8 @@ and use it like this:
 ```ts
 import { Key } from "@waradu/keyboard";
 
-useKeybind([Key.A], () => { // prefer this over $keyboard.listen as useKeybind will autoremove the listener on unmounted
+useKeybind([Key.A], () => {
+  // prefer this over $keyboard.listen as useKeybind will autoremove the listener on unmounted
   console.log("Pressed A");
 });
 ```
@@ -100,3 +101,12 @@ $keyboard.destroy();
 ```
 
 You can find the complete list of available keys in the `src/keys.ts` file.
+
+## v4 Roadmap
+
+- [ ] Use `e.key` instead of `e.code`
+- [ ] Multiple Keybinds per listener
+- [ ] Remove the need to use `Key.*`
+- [ ] Rewrite `runIfFocused` to `elements` to allow multiple targets
+- [ ] Ignore `event.isComposing` and Dead keys
+- [ ] Remove `ignoreCase`
