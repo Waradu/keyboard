@@ -32,5 +32,8 @@
     "keyboard",
     "events",
     "keybinds"
-  ]
+  ],
+  "scripts": {
+    "test-types": "tsc --noEmit tests/types.ts"
+  }
 }

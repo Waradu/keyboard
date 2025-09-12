@@ -1,4 +1,4 @@
-import type { KeyString } from "src/keys";
+import type { KeyString } from "../src/keys";
 
 // Should not have any typescript errors
 

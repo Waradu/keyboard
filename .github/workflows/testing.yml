@@ -8,12 +8,22 @@ on:
 
 name: testing
 jobs:
-  my-job:
-    name: my-job
+  tests:
+    name: tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [test, test-types]
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
 
+      - name: Cache bun
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
       - run: bun install --frozen-lockfile
-      - run: bun test
+      - run: bun ${{ matrix.task }}
