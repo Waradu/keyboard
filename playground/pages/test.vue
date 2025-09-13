@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-const off = useKeybind([
+useKeybind([
   {
     keys: ["a"],
     run() {
@@ -18,4 +18,24 @@ const off = useKeybind([
     },
   },
 ]);
+
+useKeybind({
+  keys: ["control_r", "meta_r"],
+  run() {
+    console.log("Refresh prevented!");
+  },
+  config: {
+    prevent: true,
+  },
+});
+
+useKeybind({
+  keys: ["escape"],
+  run() {
+    console.log("Escape pressed, this will only log once.");
+  },
+  config: {
+    once: true,
+  },
+});
 </script>

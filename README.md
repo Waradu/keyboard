@@ -11,6 +11,7 @@
 - [Config](#config)
 - [v6 Changes](#v6-changes)
 - [Development](#development)
+- [Examples](#examples)
 
 ### Install
 
@@ -51,7 +52,7 @@ useKeybind({
 });
 ```
 
-If you need to access the useKeyboard instance use the nuxt plugin.
+If you need to access the useKeyboard instance use the Nuxt plugin.
 
 ```ts
 const { $keyboard } = useNuxtApp();
@@ -114,7 +115,7 @@ The structure looks like this (`?` = optional, `!` = required):
 Meta is the equivalent of `windows key` on windows or `cmd` on macos.
 The order is fixed, the `key` will always come last, `control` always after `meta` etc. The modifiers are not required.
 
-Some example to get a better understanding:
+Some examples to get a better understanding:
 
 - `"control_x"`: ✅
 - `"meta_control_alt_shift_arrow-up"`: ✅
@@ -127,25 +128,22 @@ Some example to get a better understanding:
 
 Why move from the old way (`[Key.Control, Key.X]`)?
 
-1. It does not require the import of a seperate property.
+1. You don't need to import a separate property anymore.
 2. A valid key sequence is enforced (`[Key.X, Key.X]` was valid).
 3. The order is fixed so it is more consistent.
 4. Easier to read.
 
 ### Handler
 
-The handler is a function that runs when the key sequence is pressed.
+The handler is a function that runs when the key sequence is pressed. It can be written in multiple ways.
 
 ```ts
 keyboard.listen({
   ...
-  run(event) {
-    console.log("test");
-  },
-  // or with an arrow function:
-  run: (event) => {
-    console.log("test");
-  },
+  run(event) { ... } // object method (preferred)
+  run: (event) => { ... } // arrow function
+  run: function (event) { ... } // function expression
+  run: handleEvent // external function
   ...
 });
 ```
@@ -155,7 +153,7 @@ keyboard.listen({
 You can configure and change the behavior of the listener. All keys are optional.
 
 ```ts
-const emailInput = document.getElementById("passwordInput"); // Normal
+const emailInput = document.getElementById("emailInput"); // Normal
 const passwordInput = useTemplateRef("passwordInput"); // Nuxt
 
 keyboard.listen({
@@ -168,6 +166,7 @@ keyboard.listen({
     ignoreIfEditable: true,
 
     // A list of elements which one has to be focused for the listener to run.
+    // The DOM needs to be ready ("DOMContentLoaded" or onMounted (nuxt)).
     runIfFocused: [emailInput, passwordInput],
 
     // Call preventDefault() before run.
@@ -184,8 +183,8 @@ Also you can pass a `signal` to the config or the useKeyboard to abort them with
 ### v6 Changes
 
 - Use `e.key` instead of `e.code`
-- Multiple Keybinds per listener
-- Remove the need to use `Key.*`
+- Support multiple keybinds per listener
+- No longer need to use `Key.*`
 - Rewrite `runIfFocused` to `elements` to allow multiple targets
 - Ignore `event.isComposing` and Dead keys
 - Remove `ignoreCase`
@@ -204,3 +203,59 @@ Use [bun](https://bun.sh).
 - `bun test`: run tests
 - `bun test-types`: run type tests
 - `bun playground`: start playground
+
+### Examples
+
+Catch any key press:
+
+```ts
+keyboard.listen({
+  keys: ["any"],
+  run(event) {
+    console.log("Key pressed:", event.key);
+  },
+});
+```
+
+Run only when an input is focused:
+
+```ts
+const input = document.getElementById("myInput");
+keyboard.listen({
+  keys: ["enter"],
+  run() {
+    console.log("Enter pressed while input is focused");
+  },
+  config: {
+    runIfFocused: [input],
+  },
+});
+```
+
+Prevent default behavior (disable refresh with Ctrl+R):
+
+```ts
+keyboard.listen({
+  keys: ["control_r"],
+  run() {
+    console.log("Refresh prevented!");
+  },
+  config: {
+    prevent: true,
+  },
+});
+```
+
+Run a listener only once:
+
+```ts
+keyboard.listen({
+  keys: ["escape"],
+  run() {
+    console.log("Escape pressed, this will only log once.");
+  },
+  config: {
+    once: true,
+  },
+});
+```

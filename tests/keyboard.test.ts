@@ -35,6 +35,25 @@ test("keyboard handler fires on 'a' press", () => {
   keyboard.destroy();
 });
 
+test("any keyboard handler fires on any press", () => {
+  const { keyboard, spy } = prepare();
+
+  keyboard.listen({
+    keys: ["any"],
+    run: spy,
+  });
+
+  down("x");
+  down("o");
+  down("Control");
+  down("3");
+  down(" ");
+
+  expect(spy).toHaveBeenCalledTimes(5);
+
+  keyboard.destroy();
+});
+
 test("one-time keyboard handler only fires once", () => {
   const { keyboard, spy } = prepare();
 
