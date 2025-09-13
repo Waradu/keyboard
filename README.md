@@ -85,6 +85,25 @@ const unlisten = keyboard.listen(...);
 unlisten();
 ```
 
+It is also possible to define multiple keybinds in one `listen` call.
+
+```ts
+const unlisten = keyboard.listen([
+  {
+    keys: ["control_z"],
+    run() {
+      console.log("undo");
+    },
+  },
+  {
+    keys: ["control_y", "control_shift_z"],
+    run() {
+      console.log("redo");
+    },
+  },
+]);
+```
+
 ### Key Sequence
 
 Key sequences are just strings of characters defining the key that needs to be pressed to activate the listener. A listener can have multiple key sequences.

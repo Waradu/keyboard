@@ -23,6 +23,8 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
     const k = event.key.toLowerCase();
 
+    log(`pressed '${k}'`);
+
     if (modifiers[k as ModifierKey]) {
       pressedModifiers.add(modifiers[k as ModifierKey]);
     } else if (keys[k as KeyKey]) {
@@ -149,44 +151,54 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     }
   };
 
-  const listen = (options: Options) => {
-    if (options.config && "runIfFocused" in options.config && options.config.runIfFocused === undefined) {
-      log("'runIfFocused' is explicitly set to 'undefined'. Was that intentional?");
+  const listen = (options: Options | Options[]) => {
+    if (!Array.isArray(options)) {
+      options = [options];
     }
 
-    const config: Config = {
-      prevent: false,
-      stop: false,
-      ignoreIfEditable: false,
-      once: false,
-      ...options.config,
-    };
+    const results = options.map(option => {
+      if (option.config && "runIfFocused" in option.config && option.config.runIfFocused === undefined) {
+        log("'runIfFocused' is explicitly set to 'undefined'. Was that intentional?");
+      }
 
-    if (options.keys.includes("any")) {
-      options.keys = ["any"];
-    }
+      const config: Config = {
+        prevent: false,
+        stop: false,
+        ignoreIfEditable: false,
+        once: false,
+        ...option.config,
+      };
 
-    if (options?.config?.signal?.aborted) return () => { };
+      if (option.keys.includes("any")) {
+        option.keys = ["any"];
+      }
 
-    const id = Math.random().toString(36).slice(2, 7);
+      if (option?.config?.signal?.aborted) return;
 
-    const onAbort = () => unlisten(id);
-    if (options?.config?.signal) options.config.signal.addEventListener("abort", onAbort, { once: true });
+      const id = Math.random().toString(36).slice(2, 7);
 
-    listeners.push({
-      id,
-      off: () => config.signal?.removeEventListener("abort", onAbort),
+      const onAbort = () => unlisten(id);
+      if (option?.config?.signal) option.config.signal.addEventListener("abort", onAbort, { once: true });
 
-      keys: options.keys,
-      handler: options.run,
-      config: options.config
-    });
+      listeners.push({
+        id,
+        off: () => config.signal?.removeEventListener("abort", onAbort),
 
-    log(`added '${options.keys.join(", ")}' with id: '${id}'`);
+        keys: option.keys,
+        handler: option.run,
+        config: option.config
+      });
+
+      log(`added '${option.keys.join(", ")}' with id: '${id}'`);
+
+      return { id, onAbort };
+    }).filter(result => !!result);
 
     return () => {
-      if (config.signal) config.signal.removeEventListener("abort", onAbort);
-      unlisten(id);
+      results.forEach(result => {
+        if (config.signal) config.signal.removeEventListener("abort", result.onAbort);
+        unlisten(result.id);
+      });
     };
   };
 
