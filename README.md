@@ -198,4 +198,9 @@ Use [bun](https://bun.sh).
 1. `bun install`
 2. `cd playground`
 3. `bun install`
-4. 👍
+4. `cd ..`
+5. 👍
+
+- `bun test`: run tests
+- `bun test-types`: run type tests
+- `bun playground`: start playground

@@ -34,6 +34,7 @@
     "keybinds"
   ],
   "scripts": {
-    "test-types": "tsc --noEmit tests/types.ts"
+    "test-types": "tsc --noEmit tests/types.ts",
+    "playground": "cd playground && bun dev"
   }
 }
