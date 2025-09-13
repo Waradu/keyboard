@@ -88,7 +88,7 @@ unlisten();
 It is also possible to define multiple keybinds in one `listen` call.
 
 ```ts
-const unlisten = keyboard.listen([
+keyboard.listen([
   {
     keys: ["control_z"],
     run() {
