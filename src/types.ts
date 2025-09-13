@@ -50,6 +50,8 @@ export interface Config {
   signal?: AbortSignal;
 }
 
+export type Os = "macos" | "linux" | "windows" | "unknown";
+
 export interface KeyboardConfig {
   /**
    * Print debug messages.
@@ -58,6 +60,12 @@ export interface KeyboardConfig {
   debug?: boolean;
 
   signal?: AbortSignal;
+
+  /**
+   * Platform of the user. Set this manually to override automatic detection.
+   * If not set, `keyboard.init` will try to detect the platform itself.
+   */
+  platform?: Os;
 }
 
 export type Listener = {

@@ -10,7 +10,10 @@ import type { KeyString } from "../src/keys";
   "meta_control_alt_shift_arrow-up",
 
   // Single Key
-  "t",
+  "c",
+
+  // Platform
+  "macos:x",
 
   // Catch all
   "any",
@@ -18,11 +21,14 @@ import type { KeyString } from "../src/keys";
   // @ts-expect-error empty string
   "",
 
-  // @ts-expect-error shift comes after alt
+  // @ts-expect-error `shift` comes after `alt`
   "shift_alt_y",
 
-  // @ts-expect-error key is required
+  // @ts-expect-error `key` is required
   "meta_control",
+
+  // @ts-expect-error `lunix` is not a valid platform
+  "lunix:x",
 
   // @ts-expect-error only one `key` at a time
   "xy",

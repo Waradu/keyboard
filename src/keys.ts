@@ -109,18 +109,29 @@ export const modifiers = {
   shift: "shift",
 } as const;
 
+export const platforms = {
+  macos: "macos",
+  windows: "win",
+  linux: "linux",
+  no_macos: "no-macos",
+  no_winodws: "no-win",
+  no_linux: "no-linux",
+} as const;
+
 export type ModifierKey = keyof typeof modifiers;
 export type KeyKey = keyof typeof keys;
+export type PlatformKey = keyof typeof platforms;
 
 export type ModifierValue = (typeof modifiers)[keyof typeof modifiers];
 export type KeyValue = (typeof keys)[keyof typeof keys];
+export type PlatformValue = (typeof platforms)[keyof typeof platforms];
 
 type FixedCombinations<
   T extends readonly string[],
   Acc extends string[] = []
 > = T extends [infer F extends string, ...infer R extends string[]]
   ? | FixedCombinations<R, Acc>
-    | FixedCombinations<R, [...Acc, F]>
+  | FixedCombinations<R, [...Acc, F]>
   : Acc;
 
 type PrefixTuples = Exclude<
@@ -136,6 +147,8 @@ type Join<T extends readonly string[], Sep extends string> = T extends []
   ? `${F}${Sep}${Join<R, Sep>}`
   : string;
 
-type WithPrefix = `${Join<PrefixTuples, "_">}_${KeyValue}`;
+type WithModifier = `${Join<PrefixTuples, "_">}_${KeyValue}`;
 
-export type KeyString = KeyValue | WithPrefix | "any";
+export type KeySequence = KeyValue | WithModifier;
+
+export type KeyString = KeySequence | `${PlatformValue}:${KeySequence}` | "any";

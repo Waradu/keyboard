@@ -52,6 +52,11 @@ useKeybind({
 });
 ```
 
+It is also possible to set up your own composable and plugin for more control. Just copy the templates from the links below and skip adding `@waradu/keyboard/nuxt` to your `nuxt.config.ts`:
+
+- [Plugin](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/plugin.ts)
+- [Composable](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/composable.ts)
+
 If you need to access the useKeyboard instance use the Nuxt plugin.
 
 ```ts
@@ -97,7 +102,7 @@ keyboard.listen([
     },
   },
   {
-    keys: ["control_y", "control_shift_z"],
+    keys: ["control_shift_z"],
     run() {
       console.log("redo");
     },
@@ -110,7 +115,11 @@ keyboard.listen([
 Key sequences are just strings of characters defining the key that needs to be pressed to activate the listener. A listener can have multiple key sequences.
 
 The structure looks like this (`?` = optional, `!` = required):
-`"(meta_)?(control_)?(alt_)?(shift_)?(key)!"` or `"any"`
+`"(platform:)?(meta_)?(control_)?(alt_)?(shift_)?(key)!"` or `"any"`
+
+- `platform`: Optionally include or exclude certain platforms, for example `macos` or `no-linux`. **(experimental)**
+- `modifiers`: Keys like `control` or `shift`. They have a fixed order but are optional.
+- `key`: The actual key. Supports letters, numbers, and more (`f4`, `$`, `arrow-up` etc.). This part is required. If you notice a missing character or symbol, please open an issue.
 
 Meta is the equivalent of `windows key` on windows or `cmd` on macos.
 The order is fixed, the `key` will always come last, `control` always after `meta` etc. The modifiers are not required.
@@ -120,11 +129,15 @@ Some examples to get a better understanding:
 - `"control_x"`: ✅
 - `"meta_control_alt_shift_arrow-up"`: ✅
 - `"c"`: ✅
+- `"macos:x"`: ✅
 - `"any"`: ✅ (catch all)
 - `""`: ❌ (empty string)
 - `"shift_alt_y"`: ❌ (`shift` comes after `alt`)
 - `"meta_control"`: ❌ (`key` is required)
+- `"lunix:x"`: ❌ (`lunix` is not a valid platform)
 - `"xy"`: ❌ (only one `key` at a time)
+
+Platform detection is not always reliable. Use it at your own risk, or create your own platform detector and set it through the [config](#config).
 
 Why move from the old way (`[Key.Control, Key.X]`)?
 
@@ -132,6 +145,7 @@ Why move from the old way (`[Key.Control, Key.X]`)?
 2. A valid key sequence is enforced (`[Key.X, Key.X]` was valid).
 3. The order is fixed so it is more consistent.
 4. Easier to read.
+5. Allows for easy prefixes like `macos:`.
 
 ### Handler
 
@@ -150,7 +164,17 @@ keyboard.listen({
 
 ### Config
 
-You can configure and change the behavior of the listener. All keys are optional.
+You can set your own platform and skip the built-in detection from `keyboard.init`. Just pass one of these values as the `platform` option: "macos" | "linux" | "windows" | "unknown". This is needed for the [key sequences](#key-sequence) platform prefix.
+
+```ts
+const detectedPlatform = await yourOwnPlatformDetection();
+
+const keyboard = useKeyboard({
+  platform: detectedPlatform,
+});
+```
+
+Each listener can also be configure separately. All keys are optional.
 
 ```ts
 const emailInput = document.getElementById("emailInput"); // Normal
@@ -188,6 +212,7 @@ Also you can pass a `signal` to the config or the useKeyboard to abort them with
 - Rewrite `runIfFocused` to `elements` to allow multiple targets
 - Ignore `event.isComposing` and Dead keys
 - Remove `ignoreCase`
+- Platform specific keybinds.
 - Restructure
 
 ### Development
@@ -258,4 +283,23 @@ keyboard.listen({
     once: true,
   },
 });
+```
+
+Platform aware undo/redo:
+
+```ts
+keyboard.listen([
+  {
+    keys: ["no-macos:control_z", "macos:meta_z"],
+    run() {
+      console.log("undo");
+    },
+  },
+  {
+    keys: ["no-macos:control_shift_z", "macos:meta_shift_z"],
+    run() {
+      console.log("redo");
+    },
+  },
+]);
 ```

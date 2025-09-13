@@ -1,6 +1,6 @@
-import { isEditableElement } from "./helper";
-import { keys, modifiers, type KeyKey, type KeyString, type KeyValue, type ModifierKey, type ModifierValue } from "./keys";
-import type { Config, Handlers, KeyboardConfig, Handler, Listener, Options } from "./types";
+import { detectOsInBrowser, isEditableElement } from "./helper";
+import { keys, modifiers, type KeyKey, type KeySequence, type KeyString, type KeyValue, type ModifierKey, type ModifierValue, type PlatformValue } from "./keys";
+import type { Config, Handlers, KeyboardConfig, Handler, Listener, Options, Os } from "./types";
 
 /**
  * Create a keyboard listener.
@@ -10,12 +10,13 @@ import type { Config, Handlers, KeyboardConfig, Handler, Listener, Options } fro
 export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   const instanceSignal = config.signal;
   let listeners: Handlers = [];
+  let detectedPlatform: Os | null = config.platform ?? null;
 
   const pressedKeys = new Set<KeyValue>();
   const pressedModifiers = new Set<ModifierValue>();
 
-  const log = (text: string) => {
-    if (config.debug) console.log(`<KEYBOARD> ${text}`);
+  const log = (...text: string[]) => {
+    if (config.debug) console.log(`<KEYBOARD>`, ...text);
   };
 
   const onKeydown = (event: KeyboardEvent): void => {
@@ -32,8 +33,23 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     }
 
     const candidates = listeners.filter((l) => {
-      for (const key of l.keys) {
+      for (let key of l.keys) {
         if (key == "any") return true;
+
+        let platform: PlatformValue | undefined;
+
+        if (key.includes(":")) {
+          [platform, key] = key.split(":") as [PlatformValue, KeySequence];
+        }
+
+        if (platform) {
+          if (platform === "linux" && detectedPlatform !== "linux") continue;
+          if (platform === "win" && detectedPlatform !== "windows") continue;
+          if (platform === "macos" && detectedPlatform !== "macos") continue;
+          if (platform === "no-linux" && detectedPlatform === "linux") continue;
+          if (platform === "no-win" && detectedPlatform === "windows") continue;
+          if (platform === "no-macos" && detectedPlatform === "macos") continue;
+        }
 
         let [k, ...mods] = key.split("_").reverse() as [KeyValue, ...ModifierValue[]];
 
@@ -125,7 +141,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     clear();
   };
 
-  const init = (opts?: { signal?: AbortSignal; }) => {
+  const init = async (opts?: { signal?: AbortSignal; }) => {
     stop();
     if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
       window.addEventListener("keydown", onKeydown);
@@ -138,7 +154,14 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         else abortSignal.addEventListener("abort", destroy, { once: true });
       }
 
+      if (!detectedPlatform) detectOsInBrowser().then((res) => {
+        if (["macos", "linux", "windows"].includes(res)) detectedPlatform = res;
+        log("platform detected as:", res);
+      });
+
       log("initialized");
+    } else {
+      log("ERROR: window was not found");
     }
   };
 

@@ -21,6 +21,21 @@ useKeybind([
   },
 ]);
 
+useKeybind([
+  {
+    keys: ["no-macos:control_z", "macos:meta_z"],
+    run() {
+      console.log("undo");
+    },
+  },
+  {
+    keys: ["no-macos:control_shift_z", "macos:meta_shift_z"],
+    run() {
+      console.log("redo");
+    },
+  },
+]);
+
 const textInput = useTemplateRef("textInput");
 
 onMounted(() => {

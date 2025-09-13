@@ -1,6 +1,7 @@
 <template>
   <div>TEST</div>
   <NuxtLink to="/">index</NuxtLink>
+  <pre>Info: ctrl/cmd + r to reload page is prevent as an example on this page.</pre>
 </template>
 
 <script setup lang="ts">
@@ -38,4 +39,25 @@ useKeybind({
     once: true,
   },
 });
+
+useKeybind([
+  {
+    keys: ["macos:meta_x"],
+    run() {
+      console.log("Hello from 'macos'.");
+    },
+  },
+  {
+    keys: ["win:control_x"],
+    run() {
+      console.log("Hello from 'windows'.");
+    },
+  },
+  {
+    keys: ["linux:control_x"],
+    run() {
+      console.log("Hello from 'linux'.");
+    },
+  },
+]);
 </script>

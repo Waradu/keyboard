@@ -1,8 +1,11 @@
 import { useKeyboard } from "@waradu/keyboard";
 import { test, expect, mock } from 'bun:test';
+import type { Os } from "src/types";
 
-const prepare = () => {
-  const keyboard = useKeyboard();
+const prepare = (platform?: Os) => {
+  const keyboard = useKeyboard({
+    platform: platform
+  });
   keyboard.init();
 
   const spy = mock(() => { });
@@ -205,4 +208,50 @@ test("keyboard handler can handle complex keybinds", () => {
   expect(spy).toHaveBeenCalledTimes(1);
 
   keyboard.destroy();
+});
+
+test("keyboard handler only fires on macos", () => {
+  const { keyboard, spy } = prepare("macos");
+
+  keyboard.listen({
+    keys: ["macos:a"],
+    run: spy,
+  });
+
+  const { keyboard: keyboard2 } = prepare("linux");
+
+  keyboard2.listen({
+    keys: ["macos:a"],
+    run: spy,
+  });
+
+  down("a");
+
+  expect(spy).toHaveBeenCalledTimes(1);
+
+  keyboard.destroy();
+  keyboard2.destroy();
+});
+
+test("keyboard handler does not fire on macos", () => {
+  const { keyboard, spy } = prepare("macos");
+
+  keyboard.listen({
+    keys: ["no-macos:a"],
+    run: spy,
+  });
+
+  const { keyboard: keyboard2 } = prepare("windows");
+
+  keyboard2.listen({
+    keys: ["no-macos:a"],
+    run: spy,
+  });
+
+  down("a");
+
+  expect(spy).toHaveBeenCalledTimes(1);
+
+  keyboard.destroy();
+  keyboard2.destroy();
 });
