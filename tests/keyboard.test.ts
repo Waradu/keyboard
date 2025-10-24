@@ -1,6 +1,9 @@
 import { useKeyboard } from "@waradu/keyboard";
 import { test, expect, mock } from "bun:test";
 import type { HandlerContext, Os } from "src/types";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+
+GlobalRegistrator.register();
 
 const prepare = (platform?: Os) => {
   const keyboard = useKeyboard({
