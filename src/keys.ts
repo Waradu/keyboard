@@ -30,6 +30,7 @@ export const keys = {
   "7": "7",
   "8": "8",
   "9": "9",
+  dynamicNum: "$num",
 
   // Letters
   a: "a",
@@ -94,10 +95,23 @@ export const keys = {
   "+": "plus",
   ",": "comma",
   ".": "period",
+  "*": "star",
+  "#": "hash",
+  "%": "percent",
+  "&": "ampersand",
+  "'": "single-quote",
+  '"': "double-quote",
   "/": "slash",
+  "\\": "backslash",
+  "<": "angle-brackets-open",
+  ">": "angle-brackets-close",
+  "[": "square-brackets-open",
+  "]": "square-brackets-close",
+  "{": "curly-brackets-open",
+  "}": "curly-brackets-close",
   "`": "backquote",
   "~": "tilde",
-  "$": "dollar",
+  $: "dollar",
   "?": "question-mark",
   "!": "exclamation-mark",
 } as const;
@@ -126,18 +140,14 @@ export type ModifierValue = (typeof modifiers)[keyof typeof modifiers];
 export type KeyValue = (typeof keys)[keyof typeof keys];
 export type PlatformValue = (typeof platforms)[keyof typeof platforms];
 
-type FixedCombinations<
-  T extends readonly string[],
-  Acc extends string[] = []
-> = T extends [infer F extends string, ...infer R extends string[]]
-  ? | FixedCombinations<R, Acc>
-  | FixedCombinations<R, [...Acc, F]>
+type FixedCombinations<T extends readonly string[], Acc extends string[] = []> = T extends [
+  infer F extends string,
+  ...infer R extends string[],
+]
+  ? FixedCombinations<R, Acc> | FixedCombinations<R, [...Acc, F]>
   : Acc;
 
-type PrefixTuples = Exclude<
-  FixedCombinations<["meta", "control", "alt", "shift"]>,
-  []
->;
+type PrefixTuples = Exclude<FixedCombinations<["meta", "control", "alt", "shift"]>, []>;
 
 type Join<T extends readonly string[], Sep extends string> = T extends []
   ? ""

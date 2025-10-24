@@ -36,6 +36,13 @@ useKeybind([
   },
 ]);
 
+useKeybind({
+  keys: ["alt_$num"],
+  run(ctx) {
+    console.log("Number:", ctx.template);
+  },
+});
+
 const textInput = useTemplateRef("textInput");
 
 onMounted(() => {

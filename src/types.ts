@@ -1,6 +1,12 @@
 import type { KeyString } from "./keys";
 
-export type Handler = (event: KeyboardEvent) => void;
+export interface HandlerContext {
+  template?: number;
+  listener: Listener;
+  event: KeyboardEvent;
+}
+
+export type Handler = (context: HandlerContext) => void;
 
 export interface Config {
   /**
@@ -13,12 +19,12 @@ export interface Config {
    * Note: this won't prevent other keyboard listeners on the same instance. You have to handle this youself.
    *
    * Possible values:
-   * - `true`:  
+   * - `true`:
    *   Calls `event.stopPropagation()`, preventing the event from reaching parent targets but allowing any remaining listeners on this same element to run.
-   * - `"immediate"`:  
+   * - `"immediate"`:
    *   Calls `event.stopImmediatePropagation()`, preventing any further listeners on this same element from running, but still allowing the event to bubble to parent targets.
-   * - `"both"`:  
-   *   Stop *immediate* propagation (no further listeners on this same target)  
+   * - `"both"`:
+   *   Stop *immediate* propagation (no further listeners on this same target)
    *   **and** prevent any propagation to parent targets.
    *
    * @default false

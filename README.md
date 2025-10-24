@@ -114,15 +114,27 @@ keyboard.listen([
 
 Key sequences are just strings of characters defining the key that needs to be pressed to activate the listener. A listener can have multiple key sequences.
 
+**Details:**
+
 The structure looks like this (`?` = optional, `!` = required):
 `"(platform:)?(meta_)?(control_)?(alt_)?(shift_)?(key)!"` or `"any"`
 
 - `platform`: Optionally include or exclude certain platforms, for example `macos` or `no-linux`. **(experimental)**
 - `modifiers`: Keys like `control` or `shift`. They have a fixed order but are optional.
-- `key`: The actual key. Supports letters, numbers, and more (`f4`, `dollar`, `arrow-up` etc.). This part is required. If you notice a missing character or symbol, please open an issue.
+- `key`: The actual key. Supports letters, numbers, symbols, templates and more (`f4`, `dollar`, `arrow-up`, `$num` etc.). This part is required. If you notice a missing character or symbol you need, please open an issue.
 
 Meta is the equivalent of `windows key` on windows or `cmd` on macos.
 The order is fixed, the `key` will always come last, `control` always after `meta` etc. The modifiers are not required.
+
+Platform detection is not always reliable. Use it at your own risk, or create your own platform detector and set it through the [config](#config).
+
+**Patterns:**
+
+Currently there is only one template:
+
+- `$num`: Match any number
+
+**Examples:**
 
 Some examples to get a better understanding:
 
@@ -130,6 +142,7 @@ Some examples to get a better understanding:
 - `"meta_control_alt_shift_arrow-up"`: ✅
 - `"c"`: ✅
 - `"macos:x"`: ✅
+- `"$num"`: ✅ (number pattern)
 - `"any"`: ✅ (catch all)
 - `""`: ❌ (empty string)
 - `"shift_alt_y"`: ❌ (`shift` comes after `alt`)
@@ -137,9 +150,9 @@ Some examples to get a better understanding:
 - `"lunix:x"`: ❌ (`lunix` is not a valid platform)
 - `"xy"`: ❌ (only one `key` at a time)
 
-Platform detection is not always reliable. Use it at your own risk, or create your own platform detector and set it through the [config](#config).
+**Old version:**
 
-Why move from the old way (`[Key.Control, Key.X]`)?
+Why move to keysequences from the old way (`[Key.Control, Key.X]`)?
 
 1. You don't need to import a separate property anymore.
 2. A valid key sequence is enforced (`[Key.X, Key.X]` was valid).
@@ -154,13 +167,19 @@ The handler is a function that runs when the key sequence is pressed. It can be 
 ```ts
 keyboard.listen({
   ...
-  run(event) { ... } // object method (preferred)
-  run: (event) => { ... } // arrow function
-  run: function (event) { ... } // function expression
+  run(context) { ... } // object method (preferred)
+  run: (context) => { ... } // arrow function
+  run: function (context) { ... } // function expression
   run: handleEvent // external function
   ...
 });
 ```
+
+**Context parameter:**
+
+- `context.event`: The unchanged event from the event listener
+- `context.listener`: The listener
+- `context.template`: The result of the template if matched
 
 ### Config
 
@@ -204,7 +223,16 @@ keyboard.listen({
 
 Also you can pass a `signal` to the config or the useKeyboard to abort them with a `signal`.
 
-### v6 Changes
+### Changes
+
+**v6.2 -> v7 Key Templates:**
+
+- Added `context` to handler
+- `$num` key template
+- Fixed a bug that ignored the order of key presses
+- `any` will no longer trigger when a modifier is pressed
+
+**v5 -> v6 Platform-specific keybinds:**
 
 - Use `e.key` instead of `e.code`
 - Support multiple keybinds per listener
@@ -236,8 +264,8 @@ Catch any key press:
 ```ts
 keyboard.listen({
   keys: ["any"],
-  run(event) {
-    console.log("Key pressed:", event.key);
+  run(ctx) {
+    console.log("Key pressed:", ctx.event.key);
   },
 });
 ```
@@ -302,4 +330,15 @@ keyboard.listen([
     },
   },
 ]);
+```
+
+Catch alt with any number:
+
+```ts
+keyboard.listen({
+  keys: ["alt_$num"],
+  run(ctx) {
+    console.log("Key pressed:", ctx.template!); // 0..9
+  },
+});
 ```

@@ -1,5 +1,15 @@
 import { detectOsInBrowser, isEditableElement } from "./helper";
-import { keys, modifiers, type KeyKey, type KeySequence, type KeyString, type KeyValue, type ModifierKey, type ModifierValue, type PlatformValue } from "./keys";
+import {
+  keys,
+  modifiers,
+  type KeyKey,
+  type KeySequence,
+  type KeyString,
+  type KeyValue,
+  type ModifierKey,
+  type ModifierValue,
+  type PlatformValue,
+} from "./keys";
 import type { Config, Handlers, KeyboardConfig, Handler, Listener, Options, Os } from "./types";
 
 /**
@@ -54,11 +64,18 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
         let [k, ...mods] = key.split("_").reverse() as [KeyValue, ...ModifierValue[]];
 
-        if (!Array.from(pressedKeys).includes(k)) {
+        const pressedKeysArray = Array.from(pressedKeys);
+        const firstKey = pressedKeysArray[pressedKeysArray.length - 1]!;
+        if (k === "$num" && !parseInt(firstKey!)) {
+          continue;
+        } else if (k !== "$num" && !Array.from(pressedKeys).includes(k)) {
           continue;
         }
 
-        if (Array.from(pressedModifiers).length !== mods.length || !Array.from(pressedModifiers).every((modifier) => mods.includes(modifier))) {
+        if (
+          Array.from(pressedModifiers).length !== mods.length ||
+          !Array.from(pressedModifiers).every((modifier) => mods.includes(modifier))
+        ) {
           continue;
         }
 
@@ -73,7 +90,13 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     candidates.forEach((listener) => {
       const activeElement = document.activeElement;
 
-      if (listener.config?.ignoreIfEditable && activeElement && activeElement instanceof Element && isEditableElement(activeElement)) return;
+      if (
+        listener.config?.ignoreIfEditable &&
+        activeElement &&
+        activeElement instanceof Element &&
+        isEditableElement(activeElement)
+      )
+        return;
 
       if (listener.config?.runIfFocused) {
         const run = listener.config?.runIfFocused;
@@ -81,18 +104,31 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         if (Array.isArray(run)) {
           if (run.length == 0) return;
 
-          if (!run.some(element => {
-            return element && document.activeElement && element == document.activeElement;
-          })) return;
+          if (
+            !run.some((element) => {
+              return element && document.activeElement && element == document.activeElement;
+            })
+          )
+            return;
         }
-      };
+      }
 
       if (listener.config?.prevent) event.preventDefault();
       if (listener.config?.stop === true) event.stopPropagation();
       if (listener.config?.stop === "immediate") event.stopImmediatePropagation();
-      if (listener.config?.stop === "both") { event.stopPropagation(); event.stopImmediatePropagation(); }
+      if (listener.config?.stop === "both") {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      }
 
-      listener.handler(event);
+      const pressedKeysArray = Array.from(pressedKeys);
+      const pressedNumber = parseInt(pressedKeysArray[pressedKeysArray.length - 1]!) || undefined;
+
+      listener.handler({
+        template: pressedNumber,
+        listener: listener,
+        event: event,
+      });
       log(`handled '${listener.id}'`);
 
       if (listener.config?.once) unlisten(listener.id);
@@ -155,10 +191,11 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         else abortSignal.addEventListener("abort", destroy, { once: true });
       }
 
-      if (!detectedPlatform) detectOsInBrowser().then((res) => {
-        if (["macos", "linux", "windows"].includes(res)) detectedPlatform = res;
-        log("platform detected as:", res);
-      });
+      if (!detectedPlatform)
+        detectOsInBrowser().then((res) => {
+          if (["macos", "linux", "windows"].includes(res)) detectedPlatform = res;
+          log("platform detected as:", res);
+        });
 
       log("initialized");
     } else {
@@ -167,7 +204,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 
   const unlisten = (id: string) => {
-    const index = listeners.findIndex(l => l.id === id);
+    const index = listeners.findIndex((l) => l.id === id);
     if (index !== -1 && listeners[index]) {
       listeners[index].off();
       listeners.splice(index, 1);
@@ -180,46 +217,53 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       options = [options];
     }
 
-    const results = options.map(option => {
-      if (option.config && "runIfFocused" in option.config && option.config.runIfFocused === undefined) {
-        log("'runIfFocused' is explicitly set to 'undefined'. Was that intentional?");
-      }
+    const results = options
+      .map((option) => {
+        if (
+          option.config &&
+          "runIfFocused" in option.config &&
+          option.config.runIfFocused === undefined
+        ) {
+          log("'runIfFocused' is explicitly set to 'undefined'. Was that intentional?");
+        }
 
-      const config: Config = {
-        prevent: false,
-        stop: false,
-        ignoreIfEditable: false,
-        once: false,
-        ...option.config,
-      };
+        const config: Config = {
+          prevent: false,
+          stop: false,
+          ignoreIfEditable: false,
+          once: false,
+          ...option.config,
+        };
 
-      if (option.keys.includes("any")) {
-        option.keys = ["any"];
-      }
+        if (option.keys.includes("any")) {
+          option.keys = ["any"];
+        }
 
-      if (option?.config?.signal?.aborted) return;
+        if (option?.config?.signal?.aborted) return;
 
-      const id = Math.random().toString(36).slice(2, 7);
+        const id = Math.random().toString(36).slice(2, 7);
 
-      const onAbort = () => unlisten(id);
-      if (option?.config?.signal) option.config.signal.addEventListener("abort", onAbort, { once: true });
+        const onAbort = () => unlisten(id);
+        if (option?.config?.signal)
+          option.config.signal.addEventListener("abort", onAbort, { once: true });
 
-      listeners.push({
-        id,
-        off: () => config.signal?.removeEventListener("abort", onAbort),
+        listeners.push({
+          id,
+          off: () => config.signal?.removeEventListener("abort", onAbort),
 
-        keys: option.keys,
-        handler: option.run,
-        config: option.config
-      });
+          keys: option.keys,
+          handler: option.run,
+          config: option.config,
+        });
 
-      log(`added '${option.keys.join(", ")}' with id: '${id}'`);
+        log(`added '${option.keys.join(", ")}' with id: '${id}'`);
 
-      return { id, onAbort };
-    }).filter(result => !!result);
+        return { id, onAbort };
+      })
+      .filter((result) => !!result);
 
     return () => {
-      results.forEach(result => {
+      results.forEach((result) => {
         if (config.signal) config.signal.removeEventListener("abort", result.onAbort);
         unlisten(result.id);
       });

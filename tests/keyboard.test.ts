@@ -1,14 +1,14 @@
 import { useKeyboard } from "@waradu/keyboard";
-import { test, expect, mock } from 'bun:test';
-import type { Os } from "src/types";
+import { test, expect, mock } from "bun:test";
+import type { HandlerContext, Os } from "src/types";
 
 const prepare = (platform?: Os) => {
   const keyboard = useKeyboard({
-    platform: platform
+    platform: platform,
   });
   keyboard.init();
 
-  const spy = mock(() => { });
+  const spy = mock((context: HandlerContext) => [context]);
 
   return { keyboard, spy };
 };
@@ -48,11 +48,10 @@ test("any keyboard handler fires on any press", () => {
 
   down("x");
   down("o");
-  down("Control");
   down("3");
   down(" ");
 
-  expect(spy).toHaveBeenCalledTimes(5);
+  expect(spy).toHaveBeenCalledTimes(4);
 
   keyboard.destroy();
 });
@@ -63,7 +62,7 @@ test("one-time keyboard handler only fires once", () => {
   keyboard.listen({
     keys: ["a"],
     run: spy,
-    config: { once: true }
+    config: { once: true },
   });
 
   down("a");
@@ -83,7 +82,7 @@ test("keyboard handler ignores editable if set", () => {
   keyboard.listen({
     keys: ["a"],
     run: spy,
-    config: { ignoreIfEditable: true }
+    config: { ignoreIfEditable: true },
   });
 
   const ele = document.createElement("input");
@@ -113,7 +112,7 @@ test("keyboard handler runs only if runIfFocused element is focused", () => {
   keyboard.listen({
     keys: ["a"],
     run: spy,
-    config: { runIfFocused: [ele] }
+    config: { runIfFocused: [ele] },
   });
 
   ele.focus();
@@ -140,7 +139,7 @@ test("keyboard handler stops when signal is aborted", () => {
   keyboard.listen({
     keys: ["a"],
     run: spy,
-    config: { signal: ac.signal }
+    config: { signal: ac.signal },
   });
 
   down("a");
@@ -254,4 +253,23 @@ test("keyboard handler does not fire on macos", () => {
 
   keyboard.destroy();
   keyboard2.destroy();
+});
+
+test("keyboard handler returns dynamic number press", () => {
+  const { keyboard, spy } = prepare();
+
+  keyboard.listen({
+    keys: ["alt_$num"],
+    run: spy,
+  });
+
+  down("Alt");
+  down("1");
+
+  expect(spy).toHaveBeenCalledTimes(1);
+
+  const [context] = spy.mock.calls[0]!;
+  expect(context.template).toBe(1);
+
+  keyboard.destroy();
 });

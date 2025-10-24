@@ -1,9 +1,6 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
-  modules: ['../src/nuxt/index'],
-  keyboard: {
-    debug: true
-  },
+  modules: ["../src/nuxt/index"],
   devtools: { enabled: false },
 });
