@@ -28,6 +28,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
     if (modifiers[k as ModifierKey]) {
       pressedModifiers.add(modifiers[k as ModifierKey]);
+      return;
     } else if (keys[k as KeyKey]) {
       pressedKeys.add(keys[k as KeyKey]);
     }
