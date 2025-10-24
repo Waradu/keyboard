@@ -15,6 +15,9 @@ import type { KeyString } from "../src/keys";
   // Platform
   "macos:x",
 
+  // Templates
+  "alt_$num",
+
   // Catch all
   "any",
 

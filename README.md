@@ -1,5 +1,7 @@
 ## Keyboard Manager
 
+A simple yet powerful keybind manager compatible with vanilla and nuxt js.
+
 [![testing](https://github.com/Waradu/keyboard/actions/workflows/testing.yml/badge.svg)](https://github.com/Waradu/keyboard/actions/workflows/testing.yml)
 
 - [Install](#install)
@@ -9,7 +11,7 @@
 - [Key Sequence](#key-sequence)
 - [Handler](#handler)
 - [Config](#config)
-- [v6 Changes](#v6-changes)
+- [Changes](#changes)
 - [Development](#development)
 - [Examples](#examples)
 
@@ -245,13 +247,18 @@ Also you can pass a `signal` to the config or the useKeyboard to abort them with
 
 ### Development
 
-Use [bun](https://bun.sh).
+You need [bun](https://bun.sh).
 
 1. `bun install`
-2. `cd playground`
-3. `bun install`
-4. `cd ..`
-5. 👍
+2. 👍
+
+Start Playground:
+
+1. `bun playground:prepare`
+2. `bun playground`
+3. 👍
+
+Commands:
 
 - `bun test`: run tests
 - `bun test-types`: run type tests
