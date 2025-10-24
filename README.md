@@ -119,7 +119,7 @@ The structure looks like this (`?` = optional, `!` = required):
 
 - `platform`: Optionally include or exclude certain platforms, for example `macos` or `no-linux`. **(experimental)**
 - `modifiers`: Keys like `control` or `shift`. They have a fixed order but are optional.
-- `key`: The actual key. Supports letters, numbers, and more (`f4`, `$`, `arrow-up` etc.). This part is required. If you notice a missing character or symbol, please open an issue.
+- `key`: The actual key. Supports letters, numbers, and more (`f4`, `dollar`, `arrow-up` etc.). This part is required. If you notice a missing character or symbol, please open an issue.
 
 Meta is the equivalent of `windows key` on windows or `cmd` on macos.
 The order is fixed, the `key` will always come last, `control` always after `meta` etc. The modifiers are not required.
@@ -209,7 +209,7 @@ Also you can pass a `signal` to the config or the useKeyboard to abort them with
 - Use `e.key` instead of `e.code`
 - Support multiple keybinds per listener
 - No longer need to use `Key.*`
-- Rewrite `runIfFocused` to `elements` to allow multiple targets
+- Rewrite `runIfFocused` to allow multiple targets
 - Ignore `event.isComposing` and Dead keys
 - Remove `ignoreCase`
 - Platform specific keybinds.
