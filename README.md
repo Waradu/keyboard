@@ -11,6 +11,7 @@ A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 - [Key Sequence](#key-sequence)
 - [Handler](#handler)
 - [Config](#config)
+- [Directive](#directive)
 - [Changes](#changes)
 - [Development](#development)
 - [Examples](#examples)
@@ -225,7 +226,50 @@ keyboard.listen({
 
 Also you can pass a `signal` to the config or the useKeyboard to abort them with a `signal`.
 
+### Directives
+
+Add a keybind listener to any element by combining `v-keybind` and `v-run` on the same element.
+
+```html
+<input
+  type="text"
+  v-keybind="'enter'" 
+  v-run="
+    () => {
+      console.log('Hello, Directive!');
+    }
+  "
+/>
+```
+
+You can also use modifiers to prevent the default browser behavior and/or run the handler only once:
+
+```html
+<input type="text" v-keybind.prevent.once="'enter'" v-run="onEnter" />
+```
+
+Both `v-keybind` and `v-run` must be defined on the same element. If one of them is missing, the keybind will not be registered.
+
+The function passed to `v-run` behaves the same as the `run` callback in `keyboard.listen` or `useKeybind` (Nuxt). This means you can also use the `HandlerContext` parameter:
+
+```html
+<input
+  type="text"
+  v-keybind="['no-macos:control_$num', 'macos:meta_$num']"
+  v-run="
+    (ctx: HandlerContext) => {
+      console.log(ctx.template);
+    }
+  "
+/>
+```
+
 ### Changes
+
+**v7 -> v7.1 Directives:**
+
+- Added `v-keybind` and `v-run` directives
+- Allow passing a single sequence as the `keys` argument instead of requiring an array
 
 **v6.2 -> v7 Key Templates:**
 

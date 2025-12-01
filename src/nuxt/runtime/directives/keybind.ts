@@ -14,7 +14,7 @@ type SharedState = {
   registered?: boolean;
 };
 
-function tryRegister(el: HTMLInputElement, shared: SharedState) {
+function tryRegister(el: HTMLElement, shared: SharedState) {
   if (!shared.run || !shared.keys || shared.registered || !el) return;
 
   const { $keyboard } = useNuxtApp();
@@ -32,7 +32,7 @@ function tryRegister(el: HTMLInputElement, shared: SharedState) {
   shared.registered = true;
 }
 
-export const vKeybind: Directive<HTMLInputElement, Options["keys"], "prevent" | "once"> = {
+export const vKeybind: Directive<HTMLElement, Options["keys"], "prevent" | "once"> = {
   mounted(el, binding) {
     const shared: SharedState = (el as any)[KEY] ?? ((el as any)[KEY] = {});
 
@@ -44,7 +44,7 @@ export const vKeybind: Directive<HTMLInputElement, Options["keys"], "prevent" | 
 };
 
 
-export const vRun: Directive<HTMLInputElement, Options["run"]> = {
+export const vRun: Directive<HTMLElement, Options["run"]> = {
   mounted(el, binding) {
     const shared: SharedState = (el as any)[KEY] ?? ((el as any)[KEY] = {});
 
