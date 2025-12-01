@@ -1,0 +1,55 @@
+import type { Directive } from 'vue';
+import { useNuxtApp } from 'nuxt/app';
+import type { Options } from "@waradu/keyboard";
+
+const KEY = Symbol("keybind-run");
+
+type SharedState = {
+  run?: Options["run"];
+  keys?: Options["keys"];
+  modifiers?: {
+    prevent?: boolean;
+    once?: boolean;
+  };
+  registered?: boolean;
+};
+
+function tryRegister(el: HTMLInputElement, shared: SharedState) {
+  if (!shared.run || !shared.keys || shared.registered || !el) return;
+
+  const { $keyboard } = useNuxtApp();
+
+  $keyboard.listen({
+    keys: shared.keys,
+    run: shared.run,
+    config: {
+      prevent: shared.modifiers?.prevent,
+      once: shared.modifiers?.once,
+      runIfFocused: [el],
+    },
+  });
+
+  shared.registered = true;
+}
+
+export const vKeybind: Directive<HTMLInputElement, Options["keys"], "prevent" | "once"> = {
+  mounted(el, binding) {
+    const shared: SharedState = (el as any)[KEY] ?? ((el as any)[KEY] = {});
+
+    shared.modifiers = { ...binding.modifiers };
+    shared.keys = binding.value;
+
+    tryRegister(el, shared);
+  },
+};
+
+
+export const vRun: Directive<HTMLInputElement, Options["run"]> = {
+  mounted(el, binding) {
+    const shared: SharedState = (el as any)[KEY] ?? ((el as any)[KEY] = {});
+
+    shared.run = binding.value;
+
+    tryRegister(el, shared);
+  },
+};

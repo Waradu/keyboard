@@ -1,5 +1,5 @@
-import { onBeforeUnmount } from 'vue';
-import type { Options, useKeyboard } from '@waradu/keyboard';
+import { onBeforeUnmount } from "vue";
+import type { useKeyboard } from "@waradu/keyboard";
 import { useNuxtApp } from "nuxt/app";
 
 export function useKeybind(

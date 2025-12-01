@@ -10,7 +10,7 @@ import {
   type ModifierValue,
   type PlatformValue,
 } from "./keys";
-import type { Config, Handlers, KeyboardConfig, Handler, Listener, Options, Os } from "./types";
+import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options, Os } from "./types";
 
 /**
  * Create a keyboard listener.
@@ -102,8 +102,6 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         const run = listener.config?.runIfFocused;
 
         if (Array.isArray(run)) {
-          if (run.length == 0) return;
-
           if (
             !run.some((element) => {
               return element && document.activeElement && element == document.activeElement;
@@ -311,4 +309,4 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 };
 
-export { type Config, type KeyString, type Options };
+export { type Config, type KeyString, type Options, type Handler, type HandlerContext };

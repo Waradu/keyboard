@@ -38,15 +38,15 @@ export interface Config {
   /**
    * Only run listener if one of the `runIfFocused` elements is focused.
    *
-   * **IMPORTANT**: if runIfFocused is null the listener will not run.
+   * **IMPORTANT**: if runIfFocused is an empty list the listener will not run.
    * @example
    * ```ts
    * { ... } // listener will run,
    * { ..., runIfFocused: [element, element] } // listener will run if one of the elements is focused
-   * { ..., runIfFocused: null } // listener will not run!
+   * { ..., runIfFocused: [] } // listener will not run!
    * ```
    */
-  runIfFocused?: (HTMLElement | null)[];
+  runIfFocused?: (HTMLElement | null | undefined)[];
   /**
    * Only listen once and then remove the listener.
    * @default false
