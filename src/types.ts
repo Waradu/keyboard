@@ -85,7 +85,7 @@ export type Listener = {
 export type Handlers = Listener[];
 
 export interface Options {
-  keys: KeyString[];
+  keys: KeyString[] | KeyString;
   run: Handler;
   config?: Config;
 }

@@ -4,7 +4,7 @@
   <pre>Info: ctrl/cmd + r to reload page is prevent as an example on this page.</pre>
   <input
     type="text"
-    v-keybind="['enter']"
+    v-keybind="'enter'"
     v-run="
       () => {
         console.log('Hello, Directive!');
@@ -14,8 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import type { HandlerContext } from "../../src/types";
-
 useKeybind([
   {
     keys: ["a"],

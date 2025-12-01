@@ -245,6 +245,10 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         if (option?.config?.signal)
           option.config.signal.addEventListener("abort", onAbort, { once: true });
 
+        if (!Array.isArray(option.keys)) {
+          option.keys = [option.keys];
+        }
+
         listeners.push({
           id,
           off: () => config.signal?.removeEventListener("abort", onAbort),
