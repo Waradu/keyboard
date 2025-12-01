@@ -11,7 +11,7 @@ A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 - [Key Sequence](#key-sequence)
 - [Handler](#handler)
 - [Config](#config)
-- [Directive](#directive)
+- [Directives](#directives)
 - [Changes](#changes)
 - [Development](#development)
 - [Examples](#examples)
