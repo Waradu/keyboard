@@ -128,7 +128,7 @@ export const platforms = {
   windows: "win",
   linux: "linux",
   no_macos: "no-macos",
-  no_winodws: "no-win",
+  no_windows: "no-win",
   no_linux: "no-linux",
 } as const;
 
