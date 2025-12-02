@@ -11,7 +11,7 @@ A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 - [Key Sequence](#key-sequence)
 - [Handler](#handler)
 - [Config](#config)
-- [Directives](#directives)
+- [Directives (Nuxt)](#directives)
 - [Changes](#changes)
 - [Development](#development)
 - [Examples](#examples)
@@ -54,6 +54,8 @@ useKeybind({
   },
 });
 ```
+
+You can also use [directives](#directives) if you want.
 
 It is also possible to set up your own composable and plugin for more control. Just copy the templates from the links below and skip adding `@waradu/keyboard/nuxt` to your `nuxt.config.ts`:
 
@@ -227,6 +229,8 @@ keyboard.listen({
 Also you can pass a `signal` to the config or the useKeyboard to abort them with a `signal`.
 
 ### Directives
+
+This is Nuxt only.
 
 Add a keybind listener to any element by combining `v-keybind` and `v-run` on the same element.
 
