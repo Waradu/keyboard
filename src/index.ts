@@ -120,10 +120,10 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       }
 
       const pressedKeysArray = Array.from(pressedKeys);
-      const pressedNumber = parseInt(pressedKeysArray[pressedKeysArray.length - 1]!) ?? undefined;
+      const pressedNumber = parseInt(pressedKeysArray[pressedKeysArray.length - 1]!);
 
       listener.handler({
-        template: pressedNumber,
+        template: Number.isNaN(pressedNumber) ? undefined : pressedNumber,
         listener: listener,
         event: event,
       });
