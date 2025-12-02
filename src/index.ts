@@ -65,8 +65,8 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         let [k, ...mods] = key.split("_").reverse() as [KeyValue, ...ModifierValue[]];
 
         const pressedKeysArray = Array.from(pressedKeys);
-        const firstKey = pressedKeysArray[pressedKeysArray.length - 1]!;
-        if (k === "$num" && !parseInt(firstKey!)) {
+        const firstKey = pressedKeysArray[pressedKeysArray.length - 1];
+        if (k === "$num" && Number.isNaN(parseInt(firstKey!))) {
           continue;
         } else if (k !== "$num" && !Array.from(pressedKeys).includes(k)) {
           continue;
@@ -120,7 +120,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       }
 
       const pressedKeysArray = Array.from(pressedKeys);
-      const pressedNumber = parseInt(pressedKeysArray[pressedKeysArray.length - 1]!) || undefined;
+      const pressedNumber = parseInt(pressedKeysArray[pressedKeysArray.length - 1]!) ?? undefined;
 
       listener.handler({
         template: pressedNumber,
