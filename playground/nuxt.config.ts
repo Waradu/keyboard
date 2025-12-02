@@ -2,5 +2,5 @@ import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
   modules: ["../src/nuxt/index"],
-  devtools: { enabled: false },
+  devtools: { enabled: true },
 });

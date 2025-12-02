@@ -1,7 +1,6 @@
 import type { useKeyboard } from "@waradu/keyboard";
 import type { ModuleOptions } from "./index";
 import type { Directive } from "vue";
-import type { Handler } from "src/types";
 import type { vKeybind, vRun } from "./runtime/directives/keybind";
 export * from "./index";
 
