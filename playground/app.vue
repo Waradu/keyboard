@@ -29,7 +29,7 @@ const { listeners } = useKeyboardInspector();
 
 const formattedListeners = computed(() => {
   return listeners.value.map((l) => {
-    return l.keys.map((k) => parseKeyString(k));
+    return l.keys.map((k) => parseKeyString(k)).filter(k => !!k);
   });
 });
 </script>
