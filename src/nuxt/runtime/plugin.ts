@@ -1,7 +1,7 @@
 import { useKeyboard } from "@waradu/keyboard";
 import { defineNuxtPlugin, useRuntimeConfig } from "nuxt/app";
 import type { ModuleOptions } from "../index";
-import { vKeybind, vRun } from "./directives/keybind";
+import { vKeybind, vRun } from "./directives";
 
 export default defineNuxtPlugin((nuxtApp) => {
   const { public: { keyboard: opts } } = useRuntimeConfig();

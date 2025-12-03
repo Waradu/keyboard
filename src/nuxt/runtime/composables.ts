@@ -1,6 +1,7 @@
-import { onBeforeUnmount } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 import type { useKeyboard } from "@waradu/keyboard";
 import { useNuxtApp } from "nuxt/app";
+import type { Handlers } from "@waradu/keyboard";
 
 export function useKeybind(
   options: Parameters<ReturnType<typeof useKeyboard>["listen"]>[0]
@@ -14,4 +15,10 @@ export function useKeybind(
   });
 
   return off;
+}
+
+export function useKeyboardInspector() {
+  const listeners = ref<Handlers>([]);
+
+  return listeners;
 }

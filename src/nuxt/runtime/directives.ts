@@ -1,7 +1,6 @@
 import type { Directive } from 'vue';
-import { useNuxtApp } from 'nuxt/app';
 import type { Options } from "@waradu/keyboard";
-import { useKeybind } from "../composable";
+import { useKeybind } from "./composables";
 
 const KEY = Symbol("keybind-run");
 

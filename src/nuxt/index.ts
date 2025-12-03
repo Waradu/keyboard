@@ -22,10 +22,17 @@ export default defineNuxtModule<ModuleOptions>({
     addPlugin({
       src: resolve("./runtime/plugin"),
     });
+
     addImports({
       as: "useKeybind",
       name: "useKeybind",
-      from: resolve("./runtime/composable")
+      from: resolve("./runtime/composables")
+    });
+
+    addImports({
+      as: "useKeyboardInspector",
+      name: "useKeyboardInspector",
+      from: resolve("./runtime/composables")
     });
   }
 });

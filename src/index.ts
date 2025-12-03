@@ -10,7 +10,7 @@ import {
   type ModifierValue,
   type PlatformValue,
 } from "./keys";
-import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options, Os } from "./types";
+import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options, Os, Listener } from "./types";
 
 /**
  * Create a keyboard listener.
@@ -249,14 +249,16 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
           option.keys = [option.keys];
         }
 
-        listeners.push({
+        const listener: Listener = {
           id,
           off: () => config.signal?.removeEventListener("abort", onAbort),
 
           keys: option.keys,
           handler: option.run,
-          config: option.config,
-        });
+          config: config,
+        };
+
+        listeners.push(listener);
 
         log(`added '${option.keys.join(", ")}' with id: '${id}'`);
 
@@ -313,4 +315,4 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 };
 
-export { type Config, type KeyString, type Options, type Handler, type HandlerContext };
+export type { Config, KeyString, Options, Handler, Handlers, HandlerContext, Listener };

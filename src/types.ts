@@ -80,7 +80,7 @@ export type Listener = {
 
   keys: KeyString[];
   handler: Handler;
-  config?: Config;
+  config: Config;
 };
 export type Handlers = Listener[];
 

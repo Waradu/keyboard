@@ -1,7 +1,7 @@
 import type { useKeyboard } from "@waradu/keyboard";
 import type { ModuleOptions } from "./index";
 import type { Directive } from "vue";
-import type { vKeybind, vRun } from "./runtime/directives/keybind";
+import type { vKeybind, vRun } from "./runtime/directives";
 export * from "./index";
 
 type KeyboardInstance = ReturnType<typeof useKeyboard>;
