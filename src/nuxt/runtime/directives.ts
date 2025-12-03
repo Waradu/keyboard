@@ -7,6 +7,7 @@ const KEY = Symbol("keybind-run");
 type SharedState = {
   run?: Options["run"];
   keys?: Options["keys"];
+  off?: () => void;
   modifiers?: {
     prevent?: boolean;
     once?: boolean;
@@ -17,7 +18,7 @@ type SharedState = {
 function tryRegister(el: HTMLElement, shared: SharedState) {
   if (!shared.run || !shared.keys || shared.registered || !el) return;
 
-  useKeybind({
+  shared.off = useKeybind({
     keys: shared.keys,
     run: shared.run,
     config: {
@@ -30,6 +31,16 @@ function tryRegister(el: HTMLElement, shared: SharedState) {
   shared.registered = true;
 }
 
+function cleanup(el: HTMLElement) {
+  const shared: SharedState | undefined = (el as any)[KEY];
+
+  shared?.off?.();
+  if (shared) {
+    shared.registered = false;
+    shared.off = undefined;
+  }
+}
+
 export const vKeybind: Directive<HTMLElement, Options["keys"], "prevent" | "once"> = {
   mounted(el, binding) {
     const shared: SharedState = (el as any)[KEY] ?? ((el as any)[KEY] = {});
@@ -38,6 +49,9 @@ export const vKeybind: Directive<HTMLElement, Options["keys"], "prevent" | "once
     shared.keys = binding.value;
 
     tryRegister(el, shared);
+  },
+  unmounted(el) {
+    cleanup(el);
   },
 };
 
@@ -49,5 +63,8 @@ export const vRun: Directive<HTMLElement, Options["run"]> = {
     shared.run = binding.value;
 
     tryRegister(el, shared);
+  },
+  unmounted(el) {
+    cleanup(el);
   },
 };
