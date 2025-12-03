@@ -277,30 +277,37 @@ test("keyboard handler returns dynamic number press", () => {
   keyboard.destroy();
 });
 
-test("parse", () => {
-  expect(parseKeyString("x")).toBe({
+test("parse key strings", () => {
+  expect(parseKeyString("x")).toEqual({
     key: "x",
     modifiers: []
   });
 
-  expect(parseKeyString("meta_control_alt_shift_arrow-up")).toBe({
+  expect(parseKeyString("meta_control_alt_shift_arrow-up")).toEqual({
     key: "arrow-up",
     modifiers: ["meta", "control", "alt", "shift"]
   });
 
-  expect(parseKeyString("macos:x")).toBe({
+  expect(parseKeyString("macos:x")).toEqual({
     platform: "macos",
     key: "x",
     modifiers: []
   });
 
-  expect(parseKeyString("alt_$num")).toBe({
+  expect(parseKeyString("alt_$num")).toEqual({
     key: "$num",
     modifiers: ["alt"]
   });
 
-  expect(parseKeyString("any")).toBe({
+  expect(parseKeyString("any")).toEqual({
     key: "any",
     modifiers: []
   });
+
+  //@ts-expect-error out of order
+  expect(parseKeyString("meta_alt_control_k")).toBeUndefined();
+  //@ts-expect-error mac does not exist
+  expect(parseKeyString("mac:k")).toBeUndefined();
+  //@ts-expect-error notreal is not a real key (duh)
+  expect(parseKeyString("meta_notreal")).toBeUndefined();
 });

@@ -142,6 +142,9 @@ parseKeyString("meta_shift_k");
 
 parseKeyString("macos:meta_k");
 // { platform: "macos", modifiers: ["meta"], key: "k" }
+
+// invalid strings return undefined
+parseKeyString("unknown_mod_k"); // undefined
 ```
 
 It is also possible to define multiple keybinds in one `listen` call.

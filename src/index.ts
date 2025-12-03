@@ -1,4 +1,5 @@
 import { detectOsInBrowser, isEditableElement, parseKeyString } from "./helper";
+import type { FormattedKeySequence } from "./helper";
 import {
   keys,
   modifiers,
@@ -382,5 +383,15 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   };
 };
 
-export type { Config, KeyString, Options, Handler, Handlers, HandlerContext, Listener, KeySequence };
+export type {
+  Config,
+  KeyString,
+  Options,
+  Handler,
+  Handlers,
+  HandlerContext,
+  Listener,
+  KeySequence,
+  FormattedKeySequence,
+};
 export { parseKeyString };

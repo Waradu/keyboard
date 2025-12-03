@@ -1,4 +1,4 @@
-import type { KeySequence, KeyString, KeyValue, ModifierValue, PlatformValue } from "./keys";
+import { keys, modifiers, platforms, type KeySequence, type KeyString, type KeyValue, type ModifierValue, type PlatformValue } from "./keys";
 import type { Os } from "./types";
 
 export const isEditableElement = (element: Element): boolean => {
@@ -29,36 +29,56 @@ export async function detectOsInBrowser(): Promise<Os> {
   return "unknown";
 }
 
-interface FormattedKeySequence {
+export interface FormattedKeySequence {
   platform?: PlatformValue;
   modifiers: ModifierValue[];
   key: KeyValue | "any";
 }
 
 /**
- * Parse a key string into parts.
+ * Parse a key string into parts. Returns `undefined` if the string is invalid.
  */
-export const parseKeyString = (sequence: KeyString): FormattedKeySequence => {
-  if (sequence === "any") return {
-    key: "any",
-    modifiers: []
-  };
+export const parseKeyString = (sequence: KeyString): FormattedKeySequence | undefined => {
+  if (sequence === "any") {
+    return {
+      key: "any",
+      modifiers: [],
+    };
+  }
 
   let platformLabel: PlatformValue | undefined;
   let keySequence: KeySequence = sequence as KeySequence;
 
   if (sequence.includes(":")) {
     const [platform, seq] = sequence.split(":") as [PlatformValue, KeySequence];
+    if (!Object.values(platforms).includes(platform)) return;
     platformLabel = platform;
     keySequence = seq;
   }
 
-  const parts = keySequence.split("_") as ModifierValue[];
+  const parts = keySequence.split("_");
+  if (parts.length === 0) return;
+
   const key = parts.pop() as KeyValue;
+  const validKeyValues = new Set(Object.values(keys));
+  if (!validKeyValues.has(key)) return;
+
+  const modOrder: ModifierValue[] = ["meta", "control", "alt", "shift"];
+  const modSet = new Set(Object.values(modifiers));
+
+  const modifiersOnly = parts as ModifierValue[];
+
+  let lastIndex = -1;
+  for (const mod of modifiersOnly) {
+    if (!modSet.has(mod)) return;
+    const idx = modOrder.indexOf(mod);
+    if (idx === -1 || idx < lastIndex) return;
+    lastIndex = idx;
+  }
 
   return {
     platform: platformLabel,
-    modifiers: parts,
-    key: key
+    modifiers: modifiersOnly,
+    key: key,
   };
 };
