@@ -15,6 +15,7 @@ A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 - [Changes](#changes)
 - [Development](#development)
 - [Examples](#examples)
+- [Todo, Plans and Ideas](#todo-plans-and-ideas)
 
 ### Install
 
@@ -237,7 +238,7 @@ Add a keybind listener to any element by combining `v-keybind` and `v-run` on th
 ```html
 <input
   type="text"
-  v-keybind="'enter'" 
+  v-keybind="'enter'"
   v-run="
     () => {
       console.log('Hello, Directive!');
@@ -397,3 +398,9 @@ keyboard.listen({
   },
 });
 ```
+
+### Todo, Plans and Ideas:
+
+- [ ] Layers
+- [ ] Record
+- [ ] Format to human readable
