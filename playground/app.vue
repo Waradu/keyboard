@@ -3,16 +3,35 @@
   <footer>
     <span>Active listeners:</span>
     <ClientOnly>
-      <div v-for="listener in listeners" style="display: flex; align-items: center; gap: 12px">
+      <div v-for="(listener, i) in listeners" style="display: flex; align-items: center; gap: 8px">
         <pre>{{ listener.id }}:</pre>
-        {{ listener.keys.join(", ") }} {{ listener.config.once ? "(once)" : "" }}
+        <template v-for="sequence, j in formattedListeners[i]!">
+          <span v-if="sequence.platform"> {{ sequence.platform }}: </span>
+          <template v-if="sequence.modifiers.length > 0">
+            <span>
+              {{ sequence.modifiers.join(" + ") }}
+            </span>
+            +
+          </template>
+          <span>{{ sequence.key }}</span>
+          <span v-if="j < formattedListeners[i]!.length - 1">|</span>
+        </template>
+        {{ listener.config.once ? "(once)" : "" }}
       </div>
     </ClientOnly>
   </footer>
 </template>
 
 <script lang="ts" setup>
+import { parseKeyString } from "../src";
+
 const { listeners } = useKeyboardInspector();
+
+const formattedListeners = computed(() => {
+  return listeners.value.map((l) => {
+    return l.keys.map((k) => parseKeyString(k));
+  });
+});
 </script>
 
 <style>

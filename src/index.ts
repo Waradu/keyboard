@@ -1,4 +1,4 @@
-import { detectOsInBrowser, isEditableElement } from "./helper";
+import { detectOsInBrowser, isEditableElement, parseKeyString } from "./helper";
 import {
   keys,
   modifiers,
@@ -383,3 +383,4 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 };
 
 export type { Config, KeyString, Options, Handler, Handlers, HandlerContext, Listener, KeySequence };
+export { parseKeyString };

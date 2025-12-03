@@ -1,3 +1,4 @@
+import type { KeySequence, KeyString, KeyValue, ModifierValue, PlatformValue } from "./keys";
 import type { Os } from "./types";
 
 export const isEditableElement = (element: Element): boolean => {
@@ -27,3 +28,40 @@ export async function detectOsInBrowser(): Promise<Os> {
 
   return "unknown";
 }
+
+const modOrder: ModifierValue[] = ["meta", "control", "alt", "shift"];
+
+interface FormattedKeySequence {
+  platform?: string;
+  modifiers: string[];
+  key: string;
+}
+
+/**
+ * Parse a key string into parts.
+ */
+export const parseKeyString = (sequence: KeyString): FormattedKeySequence => {
+  if (sequence === "any") return {
+    key: "any",
+    modifiers: []
+  };
+
+  let platformLabel: string | undefined;
+  let keySequence: KeySequence = sequence as KeySequence;
+
+  if (sequence.includes(":")) {
+    const [platform, seq] = sequence.split(":") as [PlatformValue, KeySequence];
+    platformLabel = platform;
+    keySequence = seq;
+  }
+
+  const parts = keySequence.split("_");
+  const key = parts.pop() as KeyValue;
+
+
+  return {
+    platform: platformLabel,
+    modifiers: parts,
+    key: key
+  };
+};

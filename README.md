@@ -132,6 +132,18 @@ const stop = keyboard.record((sequence) => {
 stop();
 ```
 
+Parse a key string into parts:
+
+```ts
+import { parseKeyString } from "@waradu/keyboard";
+
+parseKeyString("meta_shift_k");
+// { modifiers: ["meta", "shift"], key: "k" }
+
+parseKeyString("macos:meta_k");
+// { platform: "macos", modifiers: ["meta"], key: "k" }
+```
+
 It is also possible to define multiple keybinds in one `listen` call.
 
 ```ts
@@ -150,6 +162,8 @@ keyboard.listen([
   },
 ]);
 ```
+
+Layers are planned so you can quickly toggle a set of keybinds depending on the current work context.
 
 ### Key Sequence
 
@@ -310,7 +324,8 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 
 - Added `keyboard.subscribe` for inspecting active listeners
 - Added `keyboard.record` to record a key sequence
-- Added Nuxt-only `useKeyboardInspector`, `useKeybindRecorder` helper
+- Added `parseKeyString` to parse a key string into parts
+- Added Nuxt-only `useKeyboardInspector` and `useKeybindRecorder` helper
 
 **v7 -> v7.1 Directives:**
 
@@ -439,9 +454,3 @@ keyboard.listen({
   },
 });
 ```
-
-### Todos, Plans and Ideas:
-
-- [ ] Layers
-- [x] Record
-- [ ] Format to human readable
