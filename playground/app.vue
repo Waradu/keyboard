@@ -1,12 +1,14 @@
 <template>
   <NuxtPage />
-  <footer>
-    <span>Active listeners:</span>
-    <div v-for="listener in listeners" style="display: flex; align-items: center; gap: 12px">
-      <pre>{{ listener.id }}:</pre>
-      {{ listener.keys.join(", ") }} {{ listener.config.once ? "(once)" : "" }}
-    </div>
-  </footer>
+  <ClientOnly>
+    <footer>
+      <span>Active listeners:</span>
+      <div v-for="listener in listeners" style="display: flex; align-items: center; gap: 12px">
+        <pre>{{ listener.id }}:</pre>
+        {{ listener.keys.join(", ") }} {{ listener.config.once ? "(once)" : "" }}
+      </div>
+    </footer>
+  </ClientOnly>
 </template>
 
 <script lang="ts" setup>
