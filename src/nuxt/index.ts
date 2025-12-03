@@ -30,6 +30,12 @@ export default defineNuxtModule<ModuleOptions>({
     });
 
     addImports({
+      as: "useKeybindLayer",
+      name: "useKeybindLayer",
+      from: resolve("./runtime/composables")
+    });
+
+    addImports({
       as: "useKeyboardInspector",
       name: "useKeyboardInspector",
       from: resolve("./runtime/composables")

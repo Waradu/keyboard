@@ -10,6 +10,7 @@ A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 - [Usage](#usage)
 - [Key Sequence](#key-sequence)
 - [Handler](#handler)
+- [Layers](#layers)
 - [Config](#config)
 - [Directives (Nuxt)](#directives)
 - [Changes](#changes)
@@ -166,8 +167,6 @@ keyboard.listen([
 ]);
 ```
 
-Layers are planned so you can quickly toggle a set of keybinds depending on the current work context.
-
 ### Key Sequence
 
 Key sequences are just strings of characters defining the key that needs to be pressed to activate the listener. A listener can have multiple key sequences.
@@ -238,6 +237,36 @@ keyboard.listen({
 - `context.event`: The unchanged event from the event listener
 - `context.listener`: The listener
 - `context.template`: The result of the template if matched
+
+### Layers
+
+Layers are used to toggle multiple keybinds together.
+
+```ts
+// can also be a list like ["editor", "anotherlayer"]
+const editor = keyboard.layers.create("editor", {
+  enabled: true, // enabled by default
+});
+
+// these only apply to the layers defined above
+editor.disable(); // disable the layer(s)
+editor.enable(); // enable the layer(s)
+editor.toggle(); // toggles each layer individually
+editor.listen(...); // the same as keyboard.listen
+editor.off(); // disables all listeners
+```
+
+You can also manage layers globally.
+
+```ts
+keyboard.layers.enable("editor");
+keyboard.layers.disable(["anotherlayer", "editor"]);
+keyboard.layers.set("anotherlayer"); // Only enable these and disable every other layers
+keyboard.layers.all(); // Enable all layers
+keyboard.layers.none(); // Disable all layers
+```
+
+in Nuxt there is a `useKeybindLayer` composable that auto unlistens on unmount.
 
 ### Config
 
@@ -322,6 +351,11 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 ```
 
 ### Changes
+
+**v7.2 -> v7.3**
+
+- Added `keyboard.layers` to create and manage layers
+- Added Nuxt-only `useKeybindLayer` composable
 
 **v7.1 -> v7.2**
 

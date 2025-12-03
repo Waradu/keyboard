@@ -73,4 +73,21 @@ useKeybind([
 useKeybindRecorder((sequence) => {
   console.log("User pressed:", sequence);
 });
+
+const editor = useKeybindLayer("editor");
+
+editor.listen({
+  keys: "y",
+  run() {
+    console.log("Editor layer");
+  },
+});
+
+useKeybind({
+  keys: "control_y",
+  run() {
+    editor.toggle();
+    console.log("Editor layer toggled");
+  },
+});
 </script>

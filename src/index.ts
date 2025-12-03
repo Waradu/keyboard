@@ -11,7 +11,7 @@ import {
   type ModifierValue,
   type PlatformValue,
 } from "./keys";
-import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options, Os, Listener, SubscribeCallback } from "./types";
+import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options, Os, Listener, SubscribeCallback, LayerOptions } from "./types";
 
 /**
  * Create a keyboard listener.
@@ -22,6 +22,8 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
   const instanceSignal = config.signal;
   let listeners: Handlers = [];
   let detectedPlatform: Os | null = config.platform ?? null;
+  const disabledLayers = new Set<string>();
+  const allLayers = new Set<string>();
 
   const pressedKeys = new Set<KeyValue>();
   const pressedModifiers = new Set<ModifierValue>();
@@ -80,7 +82,9 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
           continue;
         }
 
-        return true;
+        const hasActiveLayer = l.config.layers?.some(layer => !disabledLayers.has(layer));
+
+        return hasActiveLayer ?? true;
       }
 
       return false;
@@ -128,6 +132,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         listener: listener,
         event: event,
       });
+
       log(`handled '${listener.id}'`);
 
       if (listener.config?.once) unlisten(listener.id);
@@ -220,6 +225,14 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       options = [options];
     }
 
+    options.forEach(option => {
+      if (option.config?.layers) {
+        for (const layer of option.config?.layers) {
+          allLayers.add(layer);
+        }
+      }
+    });
+
     const results = options
       .map((option) => {
         if (
@@ -242,13 +255,12 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
           option.keys = ["any"];
         }
 
-        if (option?.config?.signal?.aborted) return;
+        if (config?.signal?.aborted) return;
 
         const id = Math.random().toString(36).slice(2, 7);
 
         const onAbort = () => unlisten(id);
-        if (option?.config?.signal)
-          option.config.signal.addEventListener("abort", onAbort, { once: true });
+        if (config?.signal) config.signal.addEventListener("abort", onAbort, { once: true });
 
         if (!Array.isArray(option.keys)) {
           option.keys = [option.keys];
@@ -324,6 +336,155 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     return () => { };
   };
 
+  const layers =
+  {
+    /**
+     * Create new keybind layer.
+     */
+    create: (layers: string | string[], layerOptions?: LayerOptions) => {
+      const offs: (() => void)[] = [];
+
+      if (!Array.isArray(layers)) {
+        layers = [layers];
+      }
+
+      layerOptions = {
+        enabled: true,
+        ...layerOptions
+      };
+
+      return {
+        /**
+         * Disable these layers
+         */
+        disable: () => {
+          for (const layer of layers) {
+            disabledLayers.add(layer);
+          }
+        },
+        /**
+         * Enable these layers
+         */
+        enable: () => {
+          for (const layer of layers) {
+            disabledLayers.delete(layer);
+          }
+        },
+        /**
+         * Enable these layers
+         */
+        toggle: () => {
+          for (const layer of layers) {
+            if (disabledLayers.has(layer)) {
+              disabledLayers.delete(layer);
+            } else {
+              disabledLayers.add(layer);
+            }
+          }
+        },
+        /**
+         * Create new listener.
+         *
+         * @param keys Key sequence to listen to.
+         * @param handler Handler function.
+         * @param config Optional settings to configure the listener.
+         * @returns Unlisten function
+         *
+         * @example
+         * ```ts
+         * const unlisten = keyboard.listen([Key.Alt, Key.A], () => {
+         *   message.value = "Alt + A key pressed";
+         * });
+         *
+         * unlisten();
+         * ```
+         */
+        listen: (options: Options | Options[]) => {
+          if (!Array.isArray(options)) {
+            options = [options];
+          }
+
+          options.forEach(option => {
+            if (!option.config) option.config = {};
+            option.config.layers = [...option.config.layers ?? [], ...layers];
+          });
+
+          if (!layerOptions.enabled) {
+            for (const layer of layers) {
+              disabledLayers.add(layer);
+            }
+          }
+
+          const off = listen(options);
+          offs.push(off);
+          return off;
+        },
+        /**
+         * Disables all listeners in layer.
+         */
+        off: () => {
+          for (const off of offs) {
+            off();
+          }
+        }
+      };
+    },
+    /**
+     * Enable specific layers.
+     */
+    enable: (layers: string | string[]) => {
+      if (!Array.isArray(layers)) {
+        layers = [layers];
+      }
+
+      for (const layer of layers) {
+        disabledLayers.delete(layer);
+      }
+    },
+    /**
+     * Disable all layers.
+     */
+    disable: (layers: string | string[]) => {
+      if (!Array.isArray(layers)) {
+        layers = [layers];
+      }
+
+      for (const layer of layers) {
+        disabledLayers.add(layer);
+      }
+    },
+    /**
+     * Set active layers.
+     */
+    set: (layers: string | string[]) => {
+      if (!Array.isArray(layers)) {
+        layers = [layers];
+      }
+
+      disabledLayers.clear();
+
+      for (const layer of allLayers) {
+        if (layers.includes(layer)) continue;
+        disabledLayers.add(layer);
+      }
+    },
+    /**
+     * Enable all layers.
+     */
+    all: () => {
+      disabledLayers.clear();
+    },
+    /**
+     * Disable all layers.
+     */
+    none: () => {
+      for (const layer of allLayers) {
+        disabledLayers.add(layer);
+      }
+    }
+  };
+
+
   return {
     /**
      * Initialize the keyboard. Call this when `window` is available (it will fail silently).
@@ -380,6 +541,10 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
      * @returns Function to stop recording.
      */
     record,
+    /**
+     * Create and manage Layers.
+     */
+    layers
   };
 };
 
@@ -393,5 +558,6 @@ export type {
   Listener,
   KeySequence,
   FormattedKeySequence,
+  LayerOptions
 };
 export { parseKeyString };

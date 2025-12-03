@@ -16,7 +16,8 @@
           <span>{{ sequence.key }}</span>
           <span v-if="j < formattedListeners[i]!.length - 1">|</span>
         </template>
-        {{ listener.config.once ? "(once)" : "" }}
+        <span>{{ listener.config.once ? "(once)" : "" }}</span>
+        <span>{{ listener.config.layers ? `(layer: ${listener.config.layers.join(", ")})` : "" }}</span>
       </div>
     </ClientOnly>
   </footer>

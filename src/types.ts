@@ -52,6 +52,11 @@ export interface Config {
    * @default false
    */
   once?: boolean;
+  /**
+   * Keybind layer.
+   * Prefer the use of `keyboard.layer` or `useKeybindLayer` (nuxt) to group listeners into layers.
+   */
+  layers?: string[];
 
   signal?: AbortSignal;
 }
@@ -72,6 +77,10 @@ export interface KeyboardConfig {
   platform?: Os;
 
   signal?: AbortSignal;
+}
+
+export interface LayerOptions {
+  enabled?: boolean;
 }
 
 export type Listener = {
