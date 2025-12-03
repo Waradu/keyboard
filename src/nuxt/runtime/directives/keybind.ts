@@ -1,6 +1,7 @@
 import type { Directive } from 'vue';
 import { useNuxtApp } from 'nuxt/app';
 import type { Options } from "@waradu/keyboard";
+import { useKeybind } from "../composable";
 
 const KEY = Symbol("keybind-run");
 
@@ -17,9 +18,7 @@ type SharedState = {
 function tryRegister(el: HTMLElement, shared: SharedState) {
   if (!shared.run || !shared.keys || shared.registered || !el) return;
 
-  const { $keyboard } = useNuxtApp();
-
-  $keyboard.listen({
+  useKeybind({
     keys: shared.keys,
     run: shared.run,
     config: {
