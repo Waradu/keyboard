@@ -10,7 +10,7 @@ import {
   type ModifierValue,
   type PlatformValue,
 } from "./keys";
-import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options, Os, Listener } from "./types";
+import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options, Os, Listener, SubscribeCallback } from "./types";
 
 /**
  * Create a keyboard listener.
@@ -159,6 +159,8 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     pressedKeys.clear();
     pressedModifiers.clear();
     log(`cleared`);
+
+    notify();
   };
 
   const stop = (): void => {
@@ -208,6 +210,8 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
       listeners.splice(index, 1);
       log(`removed: '${id}'`);
     }
+
+    notify();
   };
 
   const listen = (options: Options | Options[]) => {
@@ -260,6 +264,8 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
         listeners.push(listener);
 
+        notify();
+
         log(`added '${option.keys.join(", ")}' with id: '${id}'`);
 
         return { id, onAbort };
@@ -271,6 +277,20 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         if (config.signal) config.signal.removeEventListener("abort", result.onAbort);
         unlisten(result.id);
       });
+    };
+  };
+
+  let subscribers: SubscribeCallback[] = [];
+
+  const notify = () => {
+    subscribers.forEach((cb) => cb([...listeners]));
+  };
+
+  const subscribe = (cb: SubscribeCallback) => {
+    subscribers.push(cb);
+    cb([...listeners]);
+    return () => {
+      subscribers = subscribers.filter((fn) => fn !== cb);
     };
   };
 
@@ -312,6 +332,17 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
      * ```
      */
     listen,
+    /**
+    * Subscribe to changes of all registered keyboard listeners.
+    *
+    * The callback is called:
+    * - once immediately with the current listeners
+    * - on every add/remove/clear of listeners
+    *
+    * @param callback Receives the current list of listeners on each change.
+    * @returns Function to unsubscribe from further updates.
+    */
+    subscribe,
   };
 };
 

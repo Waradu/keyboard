@@ -65,13 +65,13 @@ export interface KeyboardConfig {
    */
   debug?: boolean;
 
-  signal?: AbortSignal;
-
   /**
    * Platform of the user. Set this manually to override automatic detection.
    * If not set, `keyboard.init` will try to detect the platform itself.
    */
   platform?: Os;
+
+  signal?: AbortSignal;
 }
 
 export type Listener = {
@@ -89,3 +89,5 @@ export interface Options {
   run: Handler;
   config?: Config;
 }
+
+export type SubscribeCallback = (handlers: Handlers) => void;
