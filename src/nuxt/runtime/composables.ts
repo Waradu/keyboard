@@ -27,9 +27,7 @@ export function useKeyboardInspector() {
 
   const listeners = ref<Handlers>([]);
 
-  let unsubscribe: (() => void) | undefined;
-
-  unsubscribe = $keyboard.subscribe((handlers) => {
+  const unsubscribe = $keyboard.subscribe((handlers) => {
     listeners.value = handlers;
   });
 
@@ -37,5 +35,5 @@ export function useKeyboardInspector() {
     unsubscribe?.();
   });
 
-  return listeners;
+  return { listeners, unsubscribe };
 }

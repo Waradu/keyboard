@@ -63,6 +63,12 @@ It is also possible to set up your own composable and plugin for more control. J
 - [Plugin](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/plugin.ts)
 - [Composable](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/composable.ts)
 
+For Nuxt you can also use the helper composable which returns a `ref` that stays in sync with `$keyboard.subscribe`:
+
+```ts
+const { listeners, unsubscribe } = useKeyboardInspector(); // auto unsubscribes on unmount
+```
+
 If you need to access the useKeyboard instance use the Nuxt plugin.
 
 ```ts
@@ -95,6 +101,17 @@ const unlisten = keyboard.listen({
 ```ts
 const unlisten = keyboard.listen(...);
 unlisten();
+```
+
+You can inspect all active listeners by subscribing:
+
+```ts
+const { listeners, unsubscribe } = keyboard.subscribe((handlers) => {
+  console.log("changed", handlers);
+});
+
+console.log("current listeners", listeners);
+unsubscribe();
 ```
 
 It is also possible to define multiple keybinds in one `listen` call.
@@ -270,6 +287,11 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 ```
 
 ### Changes
+
+**v7.1 -> v7.2**
+
+- Added `keyboard.subscribe` for inspecting active listeners
+- Added Nuxt-only `useKeyboardInspector` helper
 
 **v7 -> v7.1 Directives:**
 

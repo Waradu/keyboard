@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-const listeners = useKeyboardInspector();
+const { listeners } = useKeyboardInspector();
 </script>
 
 <style>
