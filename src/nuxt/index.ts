@@ -34,5 +34,11 @@ export default defineNuxtModule<ModuleOptions>({
       name: "useKeyboardInspector",
       from: resolve("./runtime/composables")
     });
+
+    addImports({
+      as: "useKeybindRecorder",
+      name: "useKeybindRecorder",
+      from: resolve("./runtime/composables")
+    });
   }
 });

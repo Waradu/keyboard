@@ -69,4 +69,8 @@ useKeybind([
     },
   },
 ]);
+
+useKeybindRecorder((sequence) => {
+  console.log("User pressed:", sequence);
+});
 </script>

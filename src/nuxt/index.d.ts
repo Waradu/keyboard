@@ -12,6 +12,12 @@ declare module "nuxt/app" {
   }
 }
 
+declare module "#app" {
+  interface NuxtApp {
+    $keyboard: KeyboardInstance;
+  }
+}
+
 declare module "@vue/runtime-core" {
   interface GlobalDirectives {
     vKeybind: typeof vKeybind;

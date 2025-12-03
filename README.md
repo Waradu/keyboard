@@ -15,7 +15,6 @@ A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 - [Changes](#changes)
 - [Development](#development)
 - [Examples](#examples)
-- [Todo, Plans and Ideas](#todo-plans-and-ideas)
 
 ### Install
 
@@ -63,10 +62,19 @@ It is also possible to set up your own composable and plugin for more control. J
 - [Plugin](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/plugin.ts)
 - [Composable](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/composable.ts)
 
-For Nuxt you can also use the helper composable which returns a `ref` that stays in sync with `$keyboard.subscribe`:
+You can also use the helper composable which returns a `ref` that stays in sync with `$keyboard.subscribe`:
 
 ```ts
 const { listeners, unsubscribe } = useKeyboardInspector(); // auto unsubscribes on unmount
+```
+
+To record sequences in Nuxt, use the helper that wraps `keyboard.record` and cleans up on unmount:
+
+```ts
+// auto stops on unmount
+const stop = useKeybindRecorder((sequence) => {
+  console.log("pressed", sequence); // e.g. "control_shift_k"
+});
 ```
 
 If you need to access the useKeyboard instance use the Nuxt plugin.
@@ -112,6 +120,16 @@ const { listeners, unsubscribe } = keyboard.subscribe((handlers) => {
 
 console.log("current listeners", listeners);
 unsubscribe();
+```
+
+You can also record key sequences to help users configure shortcuts:
+
+```ts
+const stop = keyboard.record((sequence) => {
+  console.log("pressed", sequence); // e.g. "control_shift_k"
+});
+
+stop();
 ```
 
 It is also possible to define multiple keybinds in one `listen` call.
@@ -291,7 +309,8 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 **v7.1 -> v7.2**
 
 - Added `keyboard.subscribe` for inspecting active listeners
-- Added Nuxt-only `useKeyboardInspector` helper
+- Added `keyboard.record` to record a key sequence
+- Added Nuxt-only `useKeyboardInspector`, `useKeybindRecorder` helper
 
 **v7 -> v7.1 Directives:**
 
@@ -421,8 +440,8 @@ keyboard.listen({
 });
 ```
 
-### Todo, Plans and Ideas:
+### Todos, Plans and Ideas:
 
 - [ ] Layers
-- [ ] Record
+- [x] Record
 - [ ] Format to human readable

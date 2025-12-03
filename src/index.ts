@@ -294,6 +294,35 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     };
   };
 
+  const record = (cb: (sequence: KeySequence) => void) => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.isComposing) return;
+
+      const key = keys[event.key.toLowerCase() as KeyKey];
+      if (!key || modifiers[event.key.toLowerCase() as ModifierKey]) return;
+
+      const sequenceParts: ModifierValue[] = [];
+      if (event.metaKey) sequenceParts.push(modifiers.meta);
+      if (event.ctrlKey) sequenceParts.push(modifiers.control);
+      if (event.altKey) sequenceParts.push(modifiers.alt);
+      if (event.shiftKey) sequenceParts.push(modifiers.shift);
+
+      const sequence = sequenceParts.length
+        ? (`${sequenceParts.join("_")}_${key}` as KeySequence)
+        : (key as KeySequence);
+
+      cb(sequence);
+    };
+
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      window.addEventListener("keydown", handler);
+      return () => window.removeEventListener("keydown", handler);
+    }
+
+    log("ERROR: window was not found");
+    return () => { };
+  };
+
   return {
     /**
      * Initialize the keyboard. Call this when `window` is available (it will fail silently).
@@ -333,17 +362,24 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
      */
     listen,
     /**
-    * Subscribe to changes of all registered keyboard listeners.
-    *
-    * The callback is called:
-    * - once immediately with the current listeners
+     * Subscribe to changes of all registered keyboard listeners.
+     *
+     * The callback is called:
+     * - once immediately with the current listeners
     * - on every add/remove/clear of listeners
     *
-    * @param callback Receives the current list of listeners on each change.
-    * @returns Function to unsubscribe from further updates.
-    */
+     * @param callback Receives the current list of listeners on each change.
+     * @returns Function to unsubscribe from further updates.
+     */
     subscribe,
+    /**
+     * Record pressed keys and emit them as a KeySequence.
+     *
+     * @param callback Receives each recorded sequence.
+     * @returns Function to stop recording.
+     */
+    record,
   };
 };
 
-export type { Config, KeyString, Options, Handler, Handlers, HandlerContext, Listener };
+export type { Config, KeyString, Options, Handler, Handlers, HandlerContext, Listener, KeySequence };
