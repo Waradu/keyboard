@@ -1,4 +1,4 @@
-import { useKeyboard } from "@waradu/keyboard";
+import { parseKeyString, useKeyboard } from "@waradu/keyboard";
 import { test, expect, mock } from "bun:test";
 import type { HandlerContext, Os } from "src/types";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
@@ -275,4 +275,32 @@ test("keyboard handler returns dynamic number press", () => {
   expect(context.template).toBe(1);
 
   keyboard.destroy();
+});
+
+test("parse", () => {
+  expect(parseKeyString("x")).toBe({
+    key: "x",
+    modifiers: []
+  });
+
+  expect(parseKeyString("meta_control_alt_shift_arrow-up")).toBe({
+    key: "arrow-up",
+    modifiers: ["meta", "control", "alt", "shift"]
+  });
+
+  expect(parseKeyString("macos:x")).toBe({
+    platform: "macos",
+    key: "x",
+    modifiers: []
+  });
+
+  expect(parseKeyString("alt_$num")).toBe({
+    key: "$num",
+    modifiers: ["alt"]
+  });
+
+  expect(parseKeyString("any")).toBe({
+    key: "any",
+    modifiers: []
+  });
 });

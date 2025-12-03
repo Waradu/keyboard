@@ -29,12 +29,10 @@ export async function detectOsInBrowser(): Promise<Os> {
   return "unknown";
 }
 
-const modOrder: ModifierValue[] = ["meta", "control", "alt", "shift"];
-
 interface FormattedKeySequence {
-  platform?: string;
-  modifiers: string[];
-  key: string;
+  platform?: PlatformValue;
+  modifiers: ModifierValue[];
+  key: KeyValue | "any";
 }
 
 /**
@@ -46,7 +44,7 @@ export const parseKeyString = (sequence: KeyString): FormattedKeySequence => {
     modifiers: []
   };
 
-  let platformLabel: string | undefined;
+  let platformLabel: PlatformValue | undefined;
   let keySequence: KeySequence = sequence as KeySequence;
 
   if (sequence.includes(":")) {
@@ -55,9 +53,8 @@ export const parseKeyString = (sequence: KeyString): FormattedKeySequence => {
     keySequence = seq;
   }
 
-  const parts = keySequence.split("_");
+  const parts = keySequence.split("_") as ModifierValue[];
   const key = parts.pop() as KeyValue;
-
 
   return {
     platform: platformLabel,
