@@ -75,6 +75,12 @@ export interface KeyboardConfig {
   debug?: boolean;
 
   /**
+   * Collect listener statistics, disable for minimal performance improvements.
+   * @default true
+   */
+  stats?: boolean;
+
+  /**
    * Platform of the user. Set this manually to override automatic detection.
    * If not set, `keyboard.init` will try to detect the platform itself.
    */
@@ -87,14 +93,22 @@ export interface LayerOptions {
   enabled?: boolean;
 }
 
-export type Listener = {
+export interface ListenerStats {
+  count: number;
+  lastTrigger: Date | null;
+}
+
+export interface Listener {
   id: string;
   off: () => void;
 
   keys: KeyString[];
   handler: Handler;
   config: Config;
+
+  stats: ListenerStats;
 };
+
 export type Handlers = Listener[];
 
 export interface Options {

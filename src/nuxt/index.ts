@@ -5,18 +5,21 @@ import type { Nuxt } from "@nuxt/schema";
 
 export interface ModuleOptions {
   debug?: boolean | undefined;
+  stats?: boolean | undefined;
 }
 
 export default defineNuxtModule<ModuleOptions>({
   meta: { name: "@waradu/keyboard/nuxt", configKey: "keyboard" },
   defaults: {
-    debug: false
+    debug: false,
+    stats: true,
   },
   setup(options: ModuleOptions, nuxt: Nuxt) {
     const { resolve } = createResolver(import.meta.url);
 
     nuxt.options.runtimeConfig.public.keyboard = {
-      debug: options.debug ?? false
+      debug: options.debug ?? false,
+      stats: options.stats ?? true,
     };
 
     addPlugin({

@@ -18,7 +18,15 @@ import type { Config, Handlers, KeyboardConfig, Handler, HandlerContext, Options
  *
  * @param config Optional settings to configure the keyboard.
  */
-export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
+export const useKeyboard = (config?: KeyboardConfig) => {
+  config = {
+    debug: false,
+    stats: true,
+    ...Object.fromEntries(
+      Object.entries(config ?? {}).filter(([, v]) => v !== undefined)
+    ),
+  };
+
   const instanceSignal = config.signal;
   let listeners: Handlers = [];
   let detectedPlatform: Os | null = config.platform ?? null;
@@ -145,10 +153,22 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
         event: event,
       });
 
+      if (config.stats) {
+        listeners.forEach(async l => {
+          if (l.id == listener.id) {
+            l.stats.count += 1;
+            l.stats.lastTrigger = new Date();
+            return;
+          }
+        });
+      }
+
       log(`handled '${listener.id}'`);
 
       if (listener.config?.once) unlisten(listener.id);
     });
+
+    if (config.stats) notify();
   };
 
   const onKeyup = (event: KeyboardEvent): void => {
@@ -282,6 +302,11 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
           keys: option.keys,
           handler: option.run,
           config: config,
+
+          stats: {
+            count: 0,
+            lastTrigger: null
+          }
         };
 
         listeners.push(listener);

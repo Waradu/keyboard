@@ -10,7 +10,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.directive("keybind", vKeybind);
 
   const keyboard = useKeyboard({
-    debug: (opts as ModuleOptions).debug
+    debug: (opts as ModuleOptions).debug,
+    stats: (opts as ModuleOptions).stats,
   });
 
   nuxtApp.hook('app:mounted', () => {
