@@ -1,4 +1,4 @@
-## Keyboard Manager
+# Keyboard Manager
 
 A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 
@@ -17,13 +17,13 @@ A simple yet powerful keybind manager compatible with vanilla and nuxt js.
 - [Development](#development)
 - [Examples](#examples)
 
-### Install
+## Install
 
 ```bash
 bun install @waradu/keyboard
 ```
 
-### Get Started
+## Get Started
 
 Start by importing `useKeyboard` and create a new keyboard instance.
 
@@ -33,7 +33,7 @@ import { useKeyboard } from "@waradu/keyboard";
 const keyboard = useKeyboard();
 ```
 
-### Nuxt
+## Nuxt
 
 Nuxt users can use the built-in module that automatically creates and initializes a keyboard instance. It also cleans up listeners when the component unmounts.
 
@@ -61,7 +61,7 @@ You can also use [directives](#directives) if you want.
 It is also possible to set up your own composable and plugin for more control. Just copy the templates from the links below and skip adding `@waradu/keyboard/nuxt` to your `nuxt.config.ts`:
 
 - [Plugin](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/plugin.ts)
-- [Composable](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/composable.ts)
+- [Composable](https://github.com/Waradu/keyboard/blob/main/src/nuxt/runtime/composables.ts)
 
 You can also use the helper composable which returns a `ref` that stays in sync with `$keyboard.subscribe`:
 
@@ -86,7 +86,7 @@ const { $keyboard } = useNuxtApp();
 $keyboard.destroy();
 ```
 
-### Usage
+## Usage
 
 Do not forget to call `keyboard.init();` once window is available.
 
@@ -167,7 +167,7 @@ keyboard.listen([
 ]);
 ```
 
-### Key Sequence
+## Key Sequence
 
 Key sequences are just strings of characters defining the key that needs to be pressed to activate the listener. A listener can have multiple key sequences.
 
@@ -207,17 +207,8 @@ Some examples to get a better understanding:
 - `"lunix:x"`: ❌ (`lunix` is not a valid platform)
 - `"xy"`: ❌ (only one `key` at a time)
 
-**Old version:**
 
-Why move to keysequences from the old way (`[Key.Control, Key.X]`)?
-
-1. You don't need to import a separate property anymore.
-2. A valid key sequence is enforced (`[Key.X, Key.X]` was valid).
-3. The order is fixed so it is more consistent.
-4. Easier to read.
-5. Allows for easy prefixes like `macos:`.
-
-### Handler
+## Handler
 
 The handler is a function that runs when the key sequence is pressed. It can be written in multiple ways.
 
@@ -232,13 +223,13 @@ keyboard.listen({
 });
 ```
 
-**Context parameter:**
+### Context parameter
 
 - `context.event`: The unchanged event from the event listener
 - `context.listener`: The listener
 - `context.template`: The result of the template if matched
 
-### Layers
+## Layers
 
 Layers are used to toggle multiple keybinds together.
 
@@ -268,7 +259,7 @@ keyboard.layers.none(); // Disable all layers
 
 in Nuxt there is a `useKeybindLayer` composable that auto unlistens on unmount.
 
-### Config
+## Config
 
 You can set your own platform and skip the built-in detection from `keyboard.init`. Just pass one of these values as the `platform` option: "macos" | "linux" | "windows" | "unknown". This is needed for the [key sequences](#key-sequence) platform prefix.
 
@@ -313,7 +304,7 @@ keyboard.listen({
 
 Also you can pass a `signal` to the config or the useKeyboard to abort them with a `signal`.
 
-### Directives
+## Directives
 
 This is Nuxt only.
 
@@ -353,38 +344,38 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 />
 ```
 
-### Changes
+## Changes
 
-**v7.3 -> v7.4**
+### v7.3 -> v7.4
 
 - Added `keyboard.exists` to check if a Key String listener already exists.
 - Added `config.when` to control whether a listener runs, using either a boolean or a predicate function.
 
-**v7.2 -> v7.3**
+### v7.2 -> v7.3
 
 - Added `keyboard.layers` to create and manage layers
 - Added Nuxt-only `useKeybindLayer` composable
 
-**v7.1 -> v7.2**
+### v7.1 -> v7.2
 
 - Added `keyboard.subscribe` for inspecting active listeners
 - Added `keyboard.record` to record a key sequence
 - Added `parseKeyString` to parse a key string into parts
 - Added Nuxt-only `useKeyboardInspector` and `useKeybindRecorder` helper
 
-**v7 -> v7.1 Directives:**
+### v7 -> v7.1 Directives
 
 - Added `v-keybind` and `v-run` directives
 - Allow passing a single sequence as the `keys` argument instead of requiring an array
 
-**v6.2 -> v7 Key Templates:**
+### v6.2 -> v7 Key Templates
 
 - Added `context` to handler
 - `$num` key template
 - Fixed a bug that ignored the order of key presses
 - `any` will no longer trigger when a modifier is pressed
 
-**v5 -> v6 Platform-specific keybinds:**
+### v5 -> v6 Platform-specific keybinds
 
 - Use `e.key` instead of `e.code`
 - Support multiple keybinds per listener
@@ -395,7 +386,7 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 - Platform specific keybinds.
 - Restructure
 
-### Development
+## Development
 
 You need [bun](https://bun.sh).
 
@@ -414,7 +405,7 @@ Commands:
 - `bun test-types`: run type tests
 - `bun playground`: start playground
 
-### Examples
+## Examples
 
 Catch any key press:
 
