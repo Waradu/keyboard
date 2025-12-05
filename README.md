@@ -352,6 +352,10 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 
 ### Changes
 
+**v7.3 -> v7.4**
+
+- Added `keyboard.exists` to check if a Key String listener already exists.
+
 **v7.2 -> v7.3**
 
 - Added `keyboard.layers` to create and manage layers

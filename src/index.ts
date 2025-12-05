@@ -484,6 +484,9 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     }
   };
 
+  const exists = (sequence: KeyString) => {
+    return listeners.some(listener => listener.keys.includes(sequence));
+  };
 
   return {
     /**
@@ -544,7 +547,11 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
     /**
      * Create and manage Layers.
      */
-    layers
+    layers,
+    /**
+     * Check if Key String listener already exists.
+     */
+    exists
   };
 };
 
