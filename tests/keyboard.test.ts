@@ -281,28 +281,53 @@ test("keyboard handler returns dynamic number press", () => {
 test("parse key string into key data", () => {
   expect(parseKeyString("x")).toEqual({
     key: "x",
-    modifiers: []
+    modifiers: {
+      alt: false,
+      control: false,
+      meta: false,
+      shift: false,
+    }
   });
 
   expect(parseKeyString("meta_control_alt_shift_arrow-up")).toEqual({
     key: "arrow-up",
-    modifiers: ["meta", "control", "alt", "shift"]
+    modifiers: {
+      alt: true,
+      control: true,
+      meta: true,
+      shift: true,
+    }
   });
 
   expect(parseKeyString("macos:x")).toEqual({
     platform: "macos",
     key: "x",
-    modifiers: []
+    modifiers: {
+      alt: false,
+      control: false,
+      meta: false,
+      shift: false,
+    }
   });
 
   expect(parseKeyString("alt_$num")).toEqual({
     key: "$num",
-    modifiers: ["alt"]
+    modifiers: {
+      alt: true,
+      control: false,
+      meta: false,
+      shift: false,
+    }
   });
 
   expect(parseKeyString("any")).toEqual({
     key: "any",
-    modifiers: []
+    modifiers: {
+      alt: false,
+      control: false,
+      meta: false,
+      shift: false,
+    }
   });
 
   //@ts-expect-error out of order
@@ -316,27 +341,34 @@ test("parse key string into key data", () => {
 test("parse key data into key string", () => {
   expect(parseKeyData({
     key: "x",
-    modifiers: []
+    modifiers: {}
   })).toEqual("x");
 
   expect(parseKeyData({
     key: "arrow-up",
-    modifiers: ["meta", "control", "alt", "shift"],
+    modifiers: {
+      alt: true,
+      control: true,
+      meta: true,
+      shift: true,
+    },
   })).toEqual("meta_control_alt_shift_arrow-up");
 
   expect(parseKeyData({
     platform: "macos",
     key: "x",
-    modifiers: [],
+    modifiers: {},
   })).toEqual("macos:x");
 
   expect(parseKeyData({
     key: "$num",
-    modifiers: ["alt"],
+    modifiers: {
+      alt: true
+    },
   })).toEqual("alt_$num");
 
   expect(parseKeyData({
     key: "any",
-    modifiers: [],
+    modifiers: {},
   })).toEqual("any");
 });

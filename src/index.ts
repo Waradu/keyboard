@@ -1,5 +1,5 @@
 import { detectOsInBrowser, isEditableElement, parseKeyString, parseKeyData } from "./helper";
-import type { FormattedKeySequence } from "./helper";
+import type { KeyData } from "./helper";
 import {
   keys,
   modifiers,
@@ -280,8 +280,14 @@ export const useKeyboard = (config?: KeyboardConfig) => {
           ...cleanConfig,
         };
 
-        if (option.keys.includes("any")) {
-          option.keys = ["any"];
+        if (!Array.isArray(option.keys)) {
+          option.keys = [option.keys];
+        }
+
+        let keys = option.keys.map(key => typeof key === "string" ? key : parseKeyData(key));
+
+        if (keys.includes("any")) {
+          keys = ["any"];
         }
 
         if (config?.signal?.aborted) return;
@@ -291,15 +297,11 @@ export const useKeyboard = (config?: KeyboardConfig) => {
         const onAbort = () => unlisten(id);
         if (config?.signal) config.signal.addEventListener("abort", onAbort, { once: true });
 
-        if (!Array.isArray(option.keys)) {
-          option.keys = [option.keys];
-        }
-
         const listener: Listener = {
           id,
           off: () => config.signal?.removeEventListener("abort", onAbort),
 
-          keys: option.keys,
+          keys: keys,
           handler: option.run,
           config: config,
 
@@ -598,7 +600,7 @@ export type {
   HandlerContext,
   Listener,
   KeySequence,
-  FormattedKeySequence,
+  KeyData,
   LayerOptions,
 };
 export { parseKeyString, parseKeyData };

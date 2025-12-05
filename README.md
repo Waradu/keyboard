@@ -103,6 +103,18 @@ const unlisten = keyboard.listen({
     // config
   },
 });
+
+// with key data
+keyboard.listen({
+  keys: [
+    {
+      key: "a",
+      modifiers: ["alt"],
+      platform: "macos",
+    },
+  ],
+  run() {},
+});
 ```
 
 `keyboard.listen` returns a unlisten function that can be called to remove the listener.
@@ -218,7 +230,6 @@ Some examples to get a better understanding:
 - `"meta_control"`: ❌ (`key` is required)
 - `"lunix:x"`: ❌ (`lunix` is not a valid platform)
 - `"xy"`: ❌ (only one `key` at a time)
-
 
 ## Handler
 
@@ -358,9 +369,12 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 
 ## Changes
 
-### v7.4 -> v7.5
+### v7.4 -> v8
 
 - Added `parseKeyData` to parse a key data into a key string
+- Renamed `FormattedKeySequence` to `KeyData`
+- `KeyData` can now also be used to define keys
+- Changed `KeyData` format
 
 ### v7.3 -> v7.4
 

@@ -7,9 +7,13 @@
         <pre>{{ listener.id }}:</pre>
         <template v-for="sequence, j in formattedListeners[i]!">
           <span v-if="sequence.platform"> {{ sequence.platform }}: </span>
-          <template v-if="sequence.modifiers.length > 0">
+          <template v-if="sequence.modifiers">
             <span>
-              {{ sequence.modifiers.join(" + ") }}
+              {{
+                Object.entries(sequence.modifiers)
+                  .map((seq) => seq[0])
+                  .join(" + ")
+              }}
             </span>
             +
           </template>
@@ -17,9 +21,13 @@
           <span v-if="j < formattedListeners[i]!.length - 1">|</span>
         </template>
         <span>{{ listener.config.once ? "(once)" : "" }}</span>
-        <span>{{ listener.config.layers ? `(layer: ${listener.config.layers.join(", ")})` : "" }}</span>
+        <span>{{
+          listener.config.layers ? `(layer: ${listener.config.layers.join(", ")})` : ""
+        }}</span>
         <span>(cound: {{ listener.stats.count }})</span>
-        <span v-if="listener.stats.lastTrigger">(last: {{ listener.stats.lastTrigger.toTimeString().slice(0, 8) }})</span>
+        <span v-if="listener.stats.lastTrigger"
+          >(last: {{ listener.stats.lastTrigger.toTimeString().slice(0, 8) }})</span
+        >
       </div>
     </ClientOnly>
   </footer>
@@ -32,7 +40,7 @@ const { listeners } = useKeyboardInspector();
 
 const formattedListeners = computed(() => {
   return listeners.value.map((l) => {
-    return l.keys.map((k) => parseKeyString(k)).filter(k => !!k);
+    return l.keys.map((k) => parseKeyString(k)).filter((k) => !!k);
   });
 });
 </script>

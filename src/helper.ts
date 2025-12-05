@@ -31,20 +31,27 @@ export async function detectOsInBrowser(): Promise<Os> {
 
 const MOD_ORDER: ModifierValue[] = ["meta", "control", "alt", "shift"];
 
-export interface FormattedKeySequence {
+export type ModifierMap = Partial<Record<ModifierValue, boolean>>;
+
+export interface KeyDataOutput {
   platform?: PlatformValue;
-  modifiers: ModifierValue[];
+  modifiers: Record<ModifierValue, boolean>;
   key: KeyValue | "any";
 }
 
 /**
  * Parse a key string into parts. Returns `undefined` if the string is invalid.
  */
-export const parseKeyString = (sequence: KeyString): FormattedKeySequence | undefined => {
+export const parseKeyString = (sequence: KeyString): KeyDataOutput | undefined => {
   if (sequence === "any") {
     return {
       key: "any",
-      modifiers: [],
+      modifiers: {
+        alt: false,
+        control: false,
+        meta: false,
+        shift: false,
+      },
     };
   }
 
@@ -66,7 +73,6 @@ export const parseKeyString = (sequence: KeyString): FormattedKeySequence | unde
   if (!validKeyValues.has(key)) return;
 
   const modSet = new Set(Object.values(modifiers));
-
   const modifiersOnly = parts as ModifierValue[];
 
   let lastIndex = -1;
@@ -77,17 +83,39 @@ export const parseKeyString = (sequence: KeyString): FormattedKeySequence | unde
     lastIndex = idx;
   }
 
+  const modifierMap: Record<ModifierValue, boolean> = {
+    alt: false,
+    control: false,
+    meta: false,
+    shift: false,
+  };
+  for (const mod of modifiersOnly) {
+    modifierMap[mod] = true;
+  }
+
   return {
     platform: platformLabel,
-    modifiers: modifiersOnly,
-    key: key,
+    modifiers: modifierMap,
+    key,
   };
 };
 
-export const parseKeyData = (data: FormattedKeySequence): KeyString => {
-  const orderedMods = [...data.modifiers].sort(
-    (a, b) => MOD_ORDER.indexOf(a) - MOD_ORDER.indexOf(b),
-  );
+export interface KeyData {
+  platform?: PlatformValue;
+  modifiers?: ModifierMap;
+  key: KeyValue | "any";
+}
+
+export const parseKeyData = (data: KeyData): KeyString => {
+  const activeModifiers: ModifierValue[] = [];
+
+  if (data.modifiers) {
+    for (const mod of MOD_ORDER) {
+      if (data.modifiers[mod]) {
+        activeModifiers.push(mod);
+      }
+    }
+  }
 
   let sequence = "";
 
@@ -95,7 +123,7 @@ export const parseKeyData = (data: FormattedKeySequence): KeyString => {
     sequence += `${data.platform}:`;
   }
 
-  for (const modifier of orderedMods) {
+  for (const modifier of activeModifiers) {
     sequence += `${modifier}_`;
   }
 

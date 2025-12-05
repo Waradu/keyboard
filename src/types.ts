@@ -1,3 +1,4 @@
+import type { KeyData } from "./helper";
 import type { KeyString } from "./keys";
 
 export interface HandlerContext {
@@ -112,7 +113,7 @@ export interface Listener {
 export type Handlers = Listener[];
 
 export interface Options {
-  keys: KeyString[] | KeyString;
+  keys: KeyString | KeyData | (KeyString | KeyData)[];
   run: Handler;
   config?: Config;
 }
