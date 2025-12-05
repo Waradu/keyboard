@@ -1,5 +1,5 @@
 import { parseKeyString, useKeyboard } from "@waradu/keyboard";
-import { test, expect, mock } from "bun:test";
+import { test, expect, mock, type Mock } from "bun:test";
 import type { HandlerContext, Os } from "src/types";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
@@ -11,7 +11,8 @@ const prepare = (platform?: Os) => {
   });
   keyboard.init();
 
-  const spy = mock((context: HandlerContext) => [context]);
+  // Should return void but we need to return the context to check fo the template.
+  const spy = mock((context: HandlerContext) => [context]) as unknown as Mock<() => void>;
 
   return { keyboard, spy };
 };
@@ -271,7 +272,7 @@ test("keyboard handler returns dynamic number press", () => {
 
   expect(spy).toHaveBeenCalledTimes(1);
 
-  const [context] = spy.mock.calls[0]!;
+  const [context] = spy.mock.calls[0]! as unknown as [HandlerContext];
   expect(context.template).toBe(1);
 
   keyboard.destroy();

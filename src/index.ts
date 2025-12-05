@@ -92,7 +92,7 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
     if (candidates.length === 0) return;
 
-    candidates.forEach((listener) => {
+    candidates.forEach(async (listener) => {
       const activeElement = document.activeElement;
 
       if (
@@ -126,6 +126,18 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
       const pressedKeysArray = Array.from(pressedKeys);
       const pressedNumber = parseInt(pressedKeysArray[pressedKeysArray.length - 1]!);
+
+      if (!listener.config.when) {
+        return;
+      } else if (typeof listener.config.when === "function") {
+        try {
+          const when = await listener.config.when();
+          if (!when) return;
+        } catch (e) {
+          console.error(e);
+          return;
+        }
+      }
 
       listener.handler({
         template: Number.isNaN(pressedNumber) ? undefined : pressedNumber,
@@ -235,20 +247,17 @@ export const useKeyboard = (config: KeyboardConfig = { debug: false }) => {
 
     const results = options
       .map((option) => {
-        if (
-          option.config &&
-          "runIfFocused" in option.config &&
-          option.config.runIfFocused === undefined
-        ) {
-          log("'runIfFocused' is explicitly set to 'undefined'. Was that intentional?");
-        }
+        const cleanConfig = Object.fromEntries(
+          Object.entries(option.config ?? {}).filter(([, v]) => v !== undefined)
+        );
 
         const config: Config = {
           prevent: false,
           stop: false,
           ignoreIfEditable: false,
           once: false,
-          ...option.config,
+          when: true,
+          ...cleanConfig,
         };
 
         if (option.keys.includes("any")) {

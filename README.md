@@ -304,6 +304,9 @@ keyboard.listen({
 
     // Call stopPropagation() before run. (use "immediate" for stopImmediatePropagation() and "both" for both).
     stop: true,
+
+    // Boolean value or predicate function before each run whether the listener should run.
+    when: true,
   }
 });
 ```
@@ -355,6 +358,7 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 **v7.3 -> v7.4**
 
 - Added `keyboard.exists` to check if a Key String listener already exists.
+- Added `config.when` to control whether a listener runs, using either a boolean or a predicate function.
 
 **v7.2 -> v7.3**
 

@@ -6,7 +6,7 @@ export interface HandlerContext {
   event: KeyboardEvent;
 }
 
-export type Handler = (context: HandlerContext) => void;
+export type Handler = (context: HandlerContext) => (void | Promise<void>);
 
 export interface Config {
   /**
@@ -57,6 +57,10 @@ export interface Config {
    * Prefer the use of `keyboard.layer` or `useKeybindLayer` (nuxt) to group listeners into layers.
    */
   layers?: string[];
+  /**
+   * Boolean value or predicate function before each run whether the listener should run.
+   */
+  when?: boolean | (() => (boolean | Promise<boolean>));
 
   signal?: AbortSignal;
 }
