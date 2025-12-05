@@ -29,6 +29,8 @@ export async function detectOsInBrowser(): Promise<Os> {
   return "unknown";
 }
 
+const MOD_ORDER: ModifierValue[] = ["meta", "control", "alt", "shift"];
+
 export interface FormattedKeySequence {
   platform?: PlatformValue;
   modifiers: ModifierValue[];
@@ -63,7 +65,6 @@ export const parseKeyString = (sequence: KeyString): FormattedKeySequence | unde
   const validKeyValues = new Set(Object.values(keys));
   if (!validKeyValues.has(key)) return;
 
-  const modOrder: ModifierValue[] = ["meta", "control", "alt", "shift"];
   const modSet = new Set(Object.values(modifiers));
 
   const modifiersOnly = parts as ModifierValue[];
@@ -71,7 +72,7 @@ export const parseKeyString = (sequence: KeyString): FormattedKeySequence | unde
   let lastIndex = -1;
   for (const mod of modifiersOnly) {
     if (!modSet.has(mod)) return;
-    const idx = modOrder.indexOf(mod);
+    const idx = MOD_ORDER.indexOf(mod);
     if (idx === -1 || idx < lastIndex) return;
     lastIndex = idx;
   }
@@ -81,4 +82,24 @@ export const parseKeyString = (sequence: KeyString): FormattedKeySequence | unde
     modifiers: modifiersOnly,
     key: key,
   };
+};
+
+export const parseKeyData = (data: FormattedKeySequence): KeyString => {
+  const orderedMods = [...data.modifiers].sort(
+    (a, b) => MOD_ORDER.indexOf(a) - MOD_ORDER.indexOf(b),
+  );
+
+  let sequence = "";
+
+  if (data.platform) {
+    sequence += `${data.platform}:`;
+  }
+
+  for (const modifier of orderedMods) {
+    sequence += `${modifier}_`;
+  }
+
+  sequence += data.key;
+
+  return sequence as KeySequence;
 };

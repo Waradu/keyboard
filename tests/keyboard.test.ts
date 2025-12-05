@@ -1,4 +1,4 @@
-import { parseKeyString, useKeyboard } from "@waradu/keyboard";
+import { parseKeyData, parseKeyString, useKeyboard } from "@waradu/keyboard";
 import { test, expect, mock, type Mock } from "bun:test";
 import type { HandlerContext, Os } from "src/types";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
@@ -278,7 +278,7 @@ test("keyboard handler returns dynamic number press", () => {
   keyboard.destroy();
 });
 
-test("parse key strings", () => {
+test("parse key string into key data", () => {
   expect(parseKeyString("x")).toEqual({
     key: "x",
     modifiers: []
@@ -311,4 +311,32 @@ test("parse key strings", () => {
   expect(parseKeyString("mac:k")).toBeUndefined();
   //@ts-expect-error notreal is not a real key (duh)
   expect(parseKeyString("meta_notreal")).toBeUndefined();
+});
+
+test("parse key data into key string", () => {
+  expect(parseKeyData({
+    key: "x",
+    modifiers: []
+  })).toEqual("x");
+
+  expect(parseKeyData({
+    key: "arrow-up",
+    modifiers: ["meta", "control", "alt", "shift"],
+  })).toEqual("meta_control_alt_shift_arrow-up");
+
+  expect(parseKeyData({
+    platform: "macos",
+    key: "x",
+    modifiers: [],
+  })).toEqual("macos:x");
+
+  expect(parseKeyData({
+    key: "$num",
+    modifiers: ["alt"],
+  })).toEqual("alt_$num");
+
+  expect(parseKeyData({
+    key: "any",
+    modifiers: [],
+  })).toEqual("any");
 });

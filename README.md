@@ -148,6 +148,18 @@ parseKeyString("macos:meta_k");
 parseKeyString("unknown_mod_k"); // undefined
 ```
 
+Or reverse:
+
+```ts
+import { parseKeyData } from "@waradu/keyboard";
+
+parseKeyData({ modifiers: ["meta", "shift"], key: "k" });
+// "meta_shift_k"
+
+parseKeyData({ platform: "macos", modifiers: ["meta"], key: "k" });
+// "macos:meta_k"
+```
+
 It is also possible to define multiple keybinds in one `listen` call.
 
 ```ts
@@ -346,6 +358,10 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 
 ## Changes
 
+### v7.4 -> v7.5
+
+- Added `parseKeyData` to parse a key data into a key string
+
 ### v7.3 -> v7.4
 
 - Added `keyboard.exists` to check if a Key String listener already exists.
@@ -360,7 +376,7 @@ The function passed to `v-run` behaves the same as the `run` callback in `keyboa
 
 - Added `keyboard.subscribe` for inspecting active listeners
 - Added `keyboard.record` to record a key sequence
-- Added `parseKeyString` to parse a key string into parts
+- Added `parseKeyString` to parse a key string into key data
 - Added Nuxt-only `useKeyboardInspector` and `useKeybindRecorder` helper
 
 ### v7 -> v7.1 Directives

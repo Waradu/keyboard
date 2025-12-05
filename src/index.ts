@@ -1,4 +1,4 @@
-import { detectOsInBrowser, isEditableElement, parseKeyString } from "./helper";
+import { detectOsInBrowser, isEditableElement, parseKeyString, parseKeyData } from "./helper";
 import type { FormattedKeySequence } from "./helper";
 import {
   keys,
@@ -599,6 +599,6 @@ export type {
   Listener,
   KeySequence,
   FormattedKeySequence,
-  LayerOptions
+  LayerOptions,
 };
-export { parseKeyString };
+export { parseKeyString, parseKeyData };
