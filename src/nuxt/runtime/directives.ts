@@ -1,7 +1,6 @@
+import type { KeySequence, Options } from "@waradu/keyboard";
 import type { Directive } from "vue";
 
-import type { KeySequence } from "../../keys";
-import type { Options } from "../../types";
 import { useKeybind } from "./composables";
 
 const KEY = Symbol("keybind");
