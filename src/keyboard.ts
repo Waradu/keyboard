@@ -1,6 +1,6 @@
 import { merge, detectOsInBrowser, isEditableElement } from "./helper";
 import { Keybind } from "./keybind";
-import { ANYKEY, keys, type KeyKey, type KeyValue } from "./keys";
+import { ANYKEY, keys, type KeyKey } from "./keys";
 import type {
   KeyboardConfig,
   Config,
@@ -16,7 +16,6 @@ export class Keyboard {
   private allLayers = new Set<string>();
   private disabledLayers = new Set<string>();
   private subscribers: SubscribeCallback[] = [];
-  private pressed = new Set<KeyValue>();
   private abortSignalListeners?: AbortController;
   ready: boolean = false;
   paused: boolean = false;
@@ -34,12 +33,9 @@ export class Keyboard {
     if (event.isComposing) return;
 
     const eventKey = event.key.toLowerCase();
-    const key = keys[eventKey as KeyKey];
+    const currentKey = keys[eventKey as KeyKey];
 
-    if (key) {
-      this.pressed.add(key);
-      this.log(`pressed '${key}'`);
-    }
+    if (currentKey) this.log(`pressed '${currentKey}'`);
 
     const browserPlatform = this.config.platform ?? detectOsInBrowser();
 
@@ -55,14 +51,11 @@ export class Keyboard {
         }
 
         if (key.key !== ANYKEY) {
-          const pressedArray = Array.from(this.pressed);
-          const lastPressed = pressedArray[pressedArray.length - 1];
+          if (!currentKey) continue;
 
-          if (!lastPressed) continue;
-
-          if (key.key === "$num" && Number.isNaN(parseInt(lastPressed!))) {
+          if (key.key === "$num" && Number.isNaN(parseInt(currentKey))) {
             continue;
-          } else if (key.key !== "$num" && lastPressed !== key.key) {
+          } else if (key.key !== "$num" && currentKey !== key.key) {
             continue;
           }
 
@@ -129,9 +122,7 @@ export class Keyboard {
         event.stopImmediatePropagation();
       }
 
-      const pressedArray = Array.from(this.pressed);
-      const lastPressed = pressedArray[pressedArray.length - 1]!;
-      const pressedNumber = lastPressed ? parseInt(lastPressed) : undefined;
+      const pressedNumber = currentKey ? parseInt(currentKey) : undefined;
 
       try {
         handler.handler({
@@ -149,24 +140,6 @@ export class Keyboard {
     });
   };
 
-  private onKeyup = (event: KeyboardEvent) => {
-    if (event.isComposing) return;
-
-    const eventKey = event.key.toLowerCase();
-    const key = keys[eventKey as KeyKey];
-    this.pressed.delete(event.key as KeyValue);
-
-    if (key) {
-      this.pressed.delete(key);
-      this.log(`released '${key}'`);
-    }
-  };
-
-  private onBlur = () => {
-    this.pressed.clear();
-    this.log("cleared due to blur");
-  };
-
   /**
    * Clear all listeners.
    */
@@ -179,7 +152,6 @@ export class Keyboard {
     this.handlers.length = 0;
     this.allLayers.clear();
     this.disabledLayers.clear();
-    this.pressed.clear();
     this.log(`cleared`);
 
     this.notify();
@@ -195,9 +167,6 @@ export class Keyboard {
 
     if (typeof window !== "undefined") {
       window.removeEventListener("keydown", this.onKeydown);
-      window.removeEventListener("keyup", this.onKeyup);
-      window.removeEventListener("blur", this.onBlur);
-      this.pressed.clear();
 
       this.ready = false;
 
@@ -206,7 +175,7 @@ export class Keyboard {
   }
 
   /**
-   * Removes all event handlers and clears any stored key state.
+   * Removes all event listeners and registered handlers.
    * Use this if you are not planning to re-enable listening with `init()` after.
    */
   destroy() {
@@ -244,8 +213,6 @@ export class Keyboard {
 
     if (typeof window !== "undefined") {
       window.addEventListener("keydown", this.onKeydown);
-      window.addEventListener("keyup", this.onKeyup);
-      window.addEventListener("blur", this.onBlur);
 
       this.ready = true;
 

@@ -323,6 +323,27 @@ test("keyboard handler maps ctrl-cmd to meta on macos and ctrl elsewhere", () =>
   windowsKeyboard.destroy();
 });
 
+test("keyboard handler does not reuse a key whose keyup was missed", () => {
+  const { keyboard, spy } = prepare("macos");
+
+  keyboard.bind({
+    keys: ["ctrl-cmd+arrow-right"],
+    run: spy,
+  });
+
+  press("Meta", { metaKey: true });
+  press("ArrowRight", { metaKey: true });
+  release("Meta");
+
+  expect(spy).toHaveBeenCalledTimes(1);
+
+  press("Meta", { metaKey: true });
+
+  expect(spy).toHaveBeenCalledTimes(1);
+
+  keyboard.destroy();
+});
+
 test("keyboard handler only fires on macos", () => {
   const { keyboard, spy } = prepare("macos");
 
