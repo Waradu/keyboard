@@ -13,6 +13,7 @@ export default defineBuildConfig({
       builder: "mkdist",
       input: "src/nuxt/runtime",
       outDir: "dist/nuxt/runtime",
+      ext: "js",
     },
   ],
   declaration: "node16",
