@@ -263,7 +263,7 @@ The structure is:
 Special keys:
 
 - `$any`: match any key and ignores modifiers
-- `$num`: match any number key and expose it as `context.template`
+- `$num`: match any physical number-row or numpad key (`0`–`9`) and expose its number as `context.template`
 
 Platform prefixes:
 
@@ -464,6 +464,7 @@ The directive automatically limits the handler to that focused element.
 - Fixed run return type by ignoring it
 - Better and faster OS detection
 - Removed stats
+- Fixed `$num` template
 
 ### v7.4 -> v8
 

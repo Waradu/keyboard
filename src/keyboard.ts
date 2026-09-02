@@ -34,12 +34,15 @@ export class Keyboard {
 
     const eventKey = event.key.toLowerCase();
     const currentKey = keys[eventKey as KeyKey];
+    const characterNumber = /^[0-9]$/.test(eventKey) ? Number(eventKey) : undefined;
+    const digit = /^(?:Digit|Numpad)([0-9])$/.exec(event.code)?.[1];
+    const pressedNumber = digit === undefined ? characterNumber : Number(digit);
 
     if (currentKey) this.log(`pressed '${currentKey}'`);
 
     const browserPlatform = this.config.platform ?? detectOsInBrowser();
 
-    const candidates = this.handlers.filter((handler) => {
+    const candidates = this.handlers.flatMap((handler) => {
       for (const key of handler.keys) {
         if (key.platform) {
           if (key.platform === "linux" && browserPlatform !== "linux") continue;
@@ -51,11 +54,9 @@ export class Keyboard {
         }
 
         if (key.key !== ANYKEY) {
-          if (!currentKey) continue;
-
-          if (key.key === "$num" && Number.isNaN(parseInt(currentKey))) {
-            continue;
-          } else if (key.key !== "$num" && currentKey !== key.key) {
+          if (key.key === "$num") {
+            if (pressedNumber === undefined) continue;
+          } else if (!currentKey || currentKey !== key.key) {
             continue;
           }
 
@@ -68,17 +69,21 @@ export class Keyboard {
           if (expectsMeta !== event.metaKey) continue;
         }
 
-        if (!handler.config.layers || handler.config.layers.length === 0) return true;
+        if (
+          handler.config.layers?.length &&
+          !handler.config.layers.some((layer) => !this.disabledLayers.has(layer))
+        )
+          return [];
 
-        return handler.config.layers.some((layer) => !this.disabledLayers.has(layer));
+        return [{ handler, template: key.key === "$num" ? pressedNumber : characterNumber }];
       }
 
-      return false;
+      return [];
     });
 
     if (candidates.length === 0) return;
 
-    candidates.forEach((handler) => {
+    candidates.forEach(({ handler, template }) => {
       const activeElement = document.activeElement;
 
       if (
@@ -122,11 +127,9 @@ export class Keyboard {
         event.stopImmediatePropagation();
       }
 
-      const pressedNumber = currentKey ? parseInt(currentKey) : undefined;
-
       try {
         handler.handler({
-          template: Number.isNaN(pressedNumber) ? undefined : pressedNumber,
+          template,
           handler,
           event,
         });
