@@ -72,6 +72,11 @@ export interface Config {
    */
   ignoreIfEditable?: boolean;
   /**
+   * Ignore repeated keydown events before when, prevent, and stop are applied.
+   * @default false
+   */
+  ignoreRepeat?: boolean;
+  /**
    * Only run listener if one of the `runIfFocused` elements is focused.
    *
    * **IMPORTANT**: if runIfFocused is an empty list the listener will not run.

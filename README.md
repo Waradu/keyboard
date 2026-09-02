@@ -389,6 +389,7 @@ keyboard.bind({
   config: {
     once: true,
     ignoreIfEditable: true,
+    ignoreRepeat: true,
     runIfFocused: [document.getElementById("email")],
     prevent: true,
     stop: true,
@@ -402,6 +403,7 @@ Available handler config:
 
 - `once`: remove the handler after the first run
 - `ignoreIfEditable`: skip while an editable element is focused
+- `ignoreRepeat`: skip repeated keydown events
 - `runIfFocused`: only run if one of the provided elements is focused
 - `prevent`: call `event.preventDefault()`
 - `stop`: call `stopPropagation`, `stopImmediatePropagation`, or both
@@ -465,6 +467,8 @@ The directive automatically limits the handler to that focused element.
 - Better and faster OS detection
 - Removed stats
 - Fixed `$num` template
+- `ignoreRepeat` option
+- Send context to when
 
 ### v7.4 -> v8
 

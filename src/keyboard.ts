@@ -103,6 +103,8 @@ export class Keyboard {
         }
       }
 
+      if (handler.config.ignoreRepeat && event.repeat) return;
+
       const activeElement = document.activeElement;
 
       if (
@@ -315,6 +317,7 @@ export class Keyboard {
         prevent: false,
         stop: false,
         ignoreIfEditable: false,
+        ignoreRepeat: false,
         once: false,
         when: true,
       });
