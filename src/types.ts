@@ -95,8 +95,9 @@ export interface Config {
   layers?: string[];
   /**
    * Boolish value or predicate function before each run whether the listener should run.
+   * Receives the same context as the handler, before prevent and stop are applied.
    */
-  when?: When | (() => When);
+  when?: When | ((context: HandlerContext) => When);
 
   signal?: AbortSignal;
 }

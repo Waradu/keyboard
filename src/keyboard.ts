@@ -5,6 +5,7 @@ import type {
   KeyboardConfig,
   Config,
   Handler,
+  HandlerContext,
   Handlers,
   SubscribeCallback,
   Options,
@@ -84,6 +85,20 @@ export class Keyboard {
     if (candidates.length === 0) return;
 
     candidates.forEach(({ handler, template }) => {
+      const context: HandlerContext = { event, template, handler };
+
+      if (!handler.config.when) {
+        return;
+      } else if (typeof handler.config.when === "function") {
+        try {
+          const when = handler.config.when(context);
+          if (!when) return;
+        } catch {
+          this.log("ERROR: when check failed, ignoring listener");
+          return;
+        }
+      }
+
       const activeElement = document.activeElement;
 
       if (
@@ -107,18 +122,6 @@ export class Keyboard {
         }
       }
 
-      if (!handler.config.when) {
-        return;
-      } else if (typeof handler.config.when === "function") {
-        try {
-          const when = handler.config.when();
-          if (!when) return;
-        } catch (e) {
-          console.error(e);
-          return;
-        }
-      }
-
       if (handler.config?.prevent) event.preventDefault();
       if (handler.config?.stop === true) event.stopPropagation();
       if (handler.config?.stop === "immediate") event.stopImmediatePropagation();
@@ -128,11 +131,7 @@ export class Keyboard {
       }
 
       try {
-        handler.handler({
-          template,
-          handler,
-          event,
-        });
+        handler.handler(context);
       } catch (e) {
         this.log(e);
       }

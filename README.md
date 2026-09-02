@@ -405,7 +405,7 @@ Available handler config:
 - `runIfFocused`: only run if one of the provided elements is focused
 - `prevent`: call `event.preventDefault()`
 - `stop`: call `stopPropagation`, `stopImmediatePropagation`, or both
-- `when`: boolean or predicate that controls whether the handler runs
+- `when`: boolean or predicate receiving the same handler context as `run`
 - `layers`: layer names assigned to the handler
 - `signal`: abort signal that removes the handler
 
