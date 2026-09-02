@@ -26,7 +26,11 @@ export class Keyboard {
   }
 
   private log(...data: any[]) {
-    if (this.config.debug) console.log("<KEYBOARD>", ...data);
+    if (this.config.debug) console.log("<KEYBOARD:DEBUG>", ...data);
+  }
+
+  private logError(...data: unknown[]) {
+    console.error("<KEYBOARD:ERROR>", ...data);
   }
 
   private onKeydown = (event: KeyboardEvent) => {
@@ -94,7 +98,7 @@ export class Keyboard {
           const when = handler.config.when(context);
           if (!when) return;
         } catch {
-          this.log("ERROR: when check failed, ignoring listener");
+          this.logError("when check failed, ignoring listener");
           return;
         }
       }
@@ -133,7 +137,7 @@ export class Keyboard {
       try {
         handler.handler(context);
       } catch (e) {
-        this.log(e);
+        this.logError(e);
       }
 
       this.log(`handled '${handler.id}'`);
@@ -246,7 +250,7 @@ export class Keyboard {
 
       this.log("initialized");
     } else {
-      this.log("ERROR: window was not found to initialize");
+      this.log("window was not found to initialize");
     }
   }
 
@@ -436,7 +440,7 @@ export class Keyboard {
       return () => window.removeEventListener("keydown", handler);
     }
 
-    this.log("ERROR: window was not found for recording");
+    this.logError("window was not found for recording");
     return () => {};
   }
 

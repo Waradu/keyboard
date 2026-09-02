@@ -1,6 +1,6 @@
 {
   "name": "@waradu/keyboard",
-  "version": "9.1.0",
+  "version": "9.1.1",
   "description": "A keyboard manager compatible with JavaScript, TypeScript and Nuxt",
   "keywords": [
     "events",
