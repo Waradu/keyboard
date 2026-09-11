@@ -12,6 +12,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const keyboard = new Keyboard({
     debug: opts.debug,
+    capture: opts.capture,
     noInit: true,
   });
 

@@ -18,6 +18,7 @@ export class Keyboard {
   private disabledLayers = new Set<string>();
   private subscribers: SubscribeCallback[] = [];
   private abortSignalListeners?: AbortController;
+  private listenerCapture = false;
   ready: boolean = false;
   paused: boolean = false;
 
@@ -174,7 +175,7 @@ export class Keyboard {
     this.abortSignalListeners = undefined;
 
     if (typeof window !== "undefined") {
-      window.removeEventListener("keydown", this.onKeydown);
+      window.removeEventListener("keydown", this.onKeydown, this.listenerCapture);
 
       this.ready = false;
 
@@ -220,7 +221,8 @@ export class Keyboard {
     this.stop();
 
     if (typeof window !== "undefined") {
-      window.addEventListener("keydown", this.onKeydown);
+      this.listenerCapture = this.config.capture ?? false;
+      window.addEventListener("keydown", this.onKeydown, this.listenerCapture);
 
       this.ready = true;
 

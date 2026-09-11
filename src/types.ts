@@ -11,6 +11,12 @@ export interface KeyboardConfig {
   debug?: boolean;
 
   /**
+   * Listen during the capture phase, before events reach focused elements.
+   * @default false
+   */
+  capture?: boolean;
+
+  /**
    * Platform of the user. Set this manually to override automatic detection.
    * If not set, the package will try to detect the platform itself.
    */

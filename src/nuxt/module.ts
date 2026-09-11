@@ -6,18 +6,21 @@ import type { vKeybind } from "./runtime/directives";
 
 export interface ModuleOptions {
   debug?: boolean | undefined;
+  capture?: boolean | undefined;
 }
 
 export default defineNuxtModule<ModuleOptions>({
   meta: { name: "@waradu/keyboard/nuxt", configKey: "keyboard" },
   defaults: {
     debug: false,
+    capture: false,
   },
   setup(options: ModuleOptions, nuxt: Nuxt) {
     const { resolve } = createResolver(import.meta.url);
 
     nuxt.options.runtimeConfig.public.keyboard = {
       debug: options.debug ?? false,
+      capture: options.capture ?? false,
     };
 
     addPlugin({

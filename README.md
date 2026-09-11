@@ -124,13 +124,14 @@ const { $keyboard } = useNuxtApp();
 $keyboard.destroy();
 ```
 
-The module accepts a `debug` option:
+The module accepts `debug` and `capture` options, both defaulting to `false`:
 
 ```ts
 export default defineNuxtConfig({
   modules: ["@waradu/keyboard/nuxt"],
   keyboard: {
-    debug: true,
+    debug: false,
+    capture: false,
   },
 });
 ```
@@ -374,7 +375,8 @@ Keyboard-level config:
 
 ```ts
 const keyboard = new Keyboard({
-  debug: true,
+  debug: false,
+  capture: false,
   platform: "macos",
   signal: abortController.signal,
 });
