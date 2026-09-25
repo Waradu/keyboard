@@ -9,14 +9,11 @@ export default defineBuildConfig({
     "src/keys",
     "src/types",
     "src/nuxt/module",
-    {
-      builder: "mkdist",
-      input: "src/nuxt/runtime",
-      outDir: "dist/nuxt/runtime",
-      ext: "js",
-    },
+    "src/nuxt/runtime/composables",
+    "src/nuxt/runtime/directives",
+    "src/nuxt/runtime/plugin",
   ],
-  declaration: "node16",
+  declaration: "compatible",
   clean: true,
   externals: ["@nuxt/kit", "@nuxt/schema", "nuxt/app", "vue"],
 });
