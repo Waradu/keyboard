@@ -137,6 +137,27 @@ export class Keybind {
     return parts;
   }
 
+  visibleOn(os?: Os) {
+    os = os ?? detectOsInBrowser();
+
+    switch (this.platform) {
+      case "macos":
+        return os === "macos";
+      case "win":
+        return os === "windows";
+      case "linux":
+        return os === "linux";
+      case "no-macos":
+        return os !== "macos";
+      case "no-win":
+        return os !== "windows";
+      case "no-linux":
+        return os !== "linux";
+      default:
+        return true;
+    }
+  }
+
   /**
    * Convert this keybind into a serializable object shape.
    *

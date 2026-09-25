@@ -472,6 +472,7 @@ The directive automatically limits the handler to that focused element.
 - `ignoreRepeat` option
 - Send context to when
 - Add metadata to keybinds
+- Add visible on helper
 
 ### v7.4 -> v8
 
