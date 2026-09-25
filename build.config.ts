@@ -10,6 +10,7 @@ export default defineBuildConfig({
     "src/types",
     "src/nuxt/module",
     "src/nuxt/runtime/composables",
+    "src/nuxt/runtime/utils",
     "src/nuxt/runtime/directives",
     "src/nuxt/runtime/plugin",
   ],

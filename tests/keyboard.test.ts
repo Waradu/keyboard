@@ -4,6 +4,7 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 
 import { Keybind } from "../src/keybind";
 import { Keyboard } from "../src/keyboard";
+import { toNuxtUiKeys } from "../src/nuxt/runtime/utils";
 import type { HandlerContext, Os } from "../src/types";
 
 GlobalRegistrator.register();
@@ -499,4 +500,25 @@ test("formats special readable key labels", () => {
   expect(Keybind.fromString("slash")?.toReadableKey()).toBe("/");
   expect(Keybind.fromString("$any")?.toReadableKey()).toBe("Any");
   expect(Keybind.fromString("alt+$num")?.toReadableKey()).toBe("Any Number");
+});
+
+test("formats keybinds for Nuxt UI Kbd", () => {
+  expect(toNuxtUiKeys(Keybind.fromString("ctrl-cmd+shift+arrow-left")!)).toEqual([
+    "meta",
+    "shift",
+    "arrowleft",
+  ]);
+  expect(
+    toNuxtUiKeys(Keybind.fromString("meta+ctrl+alt+shift+page-up")!, { platform: "macos" }),
+  ).toEqual(["command", "ctrl", "alt", "shift", "pageup"]);
+  expect(toNuxtUiKeys(Keybind.fromString("meta+enter")!, { platform: "windows" })).toEqual([
+    "win",
+    "enter",
+  ]);
+  expect(toNuxtUiKeys(Keybind.fromString("macos:meta+k")!)).toEqual(["command", "K"]);
+  expect(toNuxtUiKeys(Keybind.fromString("macos:escape")!)).toEqual(["escape"]);
+  expect(toNuxtUiKeys(Keybind.fromString("ctrl+slash")!)).toEqual(["ctrl", "/"]);
+  expect(toNuxtUiKeys(Keybind.fromString("f12")!)).toEqual(["F12"]);
+  expect(toNuxtUiKeys(Keybind.fromString("alt+$num")!)).toEqual(["alt", "Any Number"]);
+  expect(toNuxtUiKeys(Keybind.fromString("$any")!)).toEqual(["Any"]);
 });

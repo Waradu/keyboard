@@ -473,6 +473,7 @@ The directive automatically limits the handler to that focused element.
 - Send context to when
 - Add metadata to keybinds
 - Add visible on helper
+- Add Nuxt UI kbd compatible keybind converter
 
 ### v7.4 -> v8
 

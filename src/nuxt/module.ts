@@ -50,6 +50,12 @@ export default defineNuxtModule<ModuleOptions>({
       name: "useKeybindRecorder",
       from: resolve("./runtime/composables"),
     });
+
+    addImports({
+      as: "toNuxtUiKeys",
+      name: "toNuxtUiKeys",
+      from: resolve("./runtime/utils"),
+    });
   },
 });
 
