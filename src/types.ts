@@ -110,6 +110,11 @@ export interface Config {
    */
   when?: When | ((context: HandlerContext) => When);
 
+  /**
+   * Any data you want to save to the keybind.
+   */
+  meta?: Record<string, string | number | boolean | null | undefined>;
+
   signal?: AbortSignal;
 }
 

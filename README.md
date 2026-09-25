@@ -471,6 +471,7 @@ The directive automatically limits the handler to that focused element.
 - Fixed `$num` template
 - `ignoreRepeat` option
 - Send context to when
+- Add metadata to keybinds
 
 ### v7.4 -> v8
 
